@@ -14727,5 +14727,237 @@ body.ks-kate-mode .ks-kate-origin-backdrop {
 })();
 </script>
 
+
+
+<style id="kesug-v19-mobile-viewport-edge-fix">
+/* KESUG v19 — prevent mobile viewport clipping at both physical screen edges.
+   Use percentage sizing for app roots; avoid 100vw + padding on mobile. */
+@media (max-width: 899px) {
+  :root {
+    --kate-mobile-safe-left: max(12px, env(safe-area-inset-left, 0px));
+    --kate-mobile-safe-right: max(12px, env(safe-area-inset-right, 0px));
+  }
+  html,
+  body,
+  body.ks-kate-mode {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+  }
+  body.ks-kate-mode .content-wrapper,
+  body.ks-kate-mode.ks-kate-sidebar-collapsed .content-wrapper,
+  body.ks-kate-mode .content-wrapper > main {
+    position: relative !important;
+    inset-inline: 0 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    overflow-x: clip !important;
+    box-sizing: border-box !important;
+  }
+  body.ks-kate-mode .page-view,
+  body.ks-kate-mode .page-view.active {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: var(--kate-mobile-safe-left) !important;
+    padding-right: var(--kate-mobile-safe-right) !important;
+    padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)) !important;
+    overflow-x: clip !important;
+    box-sizing: border-box !important;
+  }
+  /* Fixed header spans the actual device viewport, including safe-area insets. */
+  body.ks-kate-mode #ks-kate-header {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    padding-left: max(10px, env(safe-area-inset-left, 0px)) !important;
+    padding-right: max(10px, env(safe-area-inset-right, 0px)) !important;
+    box-sizing: border-box !important;
+  }
+  body.ks-kate-mode #ks-kate-header,
+  body.ks-kate-mode #ks-kate-header * {
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+  body.ks-kate-mode #ks-kate-header .ks-kate-header-title {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+  body.ks-kate-mode #ks-kate-mobile-menu {
+    flex: 0 0 38px !important;
+    width: 38px !important;
+    min-width: 38px !important;
+    max-width: 38px !important;
+    height: 38px !important;
+    margin-left: 8px !important;
+  }
+  body.ks-kate-mode #ks-kate-sidebar {
+    left: 0 !important;
+    right: auto !important;
+    width: min(286px, calc(100vw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 24px)) !important;
+    max-width: calc(100vw - 24px) !important;
+    box-sizing: border-box !important;
+  }
+  body.ks-kate-mode #ks-kate-backdrop {
+    left: 0 !important;
+    right: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+
+  /* Home widgets and their inner grids must shrink inside the safe content width. */
+  body.ks-kate-mode #page-home-desktop {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    overflow-x: clip !important;
+    box-sizing: border-box !important;
+  }
+  body.ks-kate-mode #page-home-desktop .ks-os-root,
+  body.ks-kate-mode #page-home-desktop .ks-os-content,
+  body.ks-kate-mode #page-home-desktop .ks-os-main,
+  body.ks-kate-mode #page-home-desktop .ks-os-left-column,
+  body.ks-kate-mode #page-home-desktop .ks-os-right-column,
+  body.ks-kate-mode #page-home-desktop .ks-os-widgets,
+  body.ks-kate-mode #page-home-desktop .ks-os-widget-card,
+  body.ks-kate-mode #page-home-desktop .ks-os-widget-card > * {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+  body.ks-kate-mode #page-home-desktop .ks-os-content {
+    padding-left: var(--kate-mobile-safe-left) !important;
+    padding-right: var(--kate-mobile-safe-right) !important;
+  }
+  body.ks-kate-mode #page-home-desktop .ks-os-widgets {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-auto-columns: minmax(0, 1fr) !important;
+    align-items: stretch !important;
+  }
+
+  /* Generic page grids/cards cannot retain desktop min-content widths. */
+  body.ks-kate-mode .page-view :where(
+    .games-grid, .ks-duel-boards, .ks-duel-setup-grid,
+    .ks-music-link-fields, .ks-analytics-grid, .stat-grid,
+    .ks-os-widget-stats, .ks-more-wide-grid
+  ) {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  body.ks-kate-mode .page-view :where(
+    .game-card, .ks-duel-card, .ks-music-track-row,
+    .ks-analytics-card, .ks-more-row, .profile-card,
+    .profile-info, .profile-data-panel, .profile-actions
+  ) {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  body.ks-kate-mode .page-view :where(img, video, canvas, svg) {
+    max-width: 100% !important;
+  }
+  body.ks-kate-mode .page-view :where(input, select, textarea) {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Slot overlay fills by left/right edges instead of a padded 100vw box. */
+  body.ks-kate-mode #game-screen,
+  body.ks-kate-mode.ks-kate-sidebar-collapsed #game-screen {
+    position: fixed !important;
+    inset: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding-left: var(--kate-mobile-safe-left) !important;
+    padding-right: var(--kate-mobile-safe-right) !important;
+    padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px)) !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+  body.ks-kate-mode #game-screen > .slot-container,
+  body.ks-kate-mode #game-screen > .game-header {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 540px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+  }
+  body.ks-kate-mode #game-screen > .slot-container,
+  body.ks-kate-mode #game-screen .reels,
+  body.ks-kate-mode #game-screen .reel-window {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Settings and modal sheets stay inside the safe visible area. */
+  body.ks-kate-mode #ks-os-settings-panel,
+  body.ks-kate-mode .ks-kate-origin-dialog {
+    left: max(8px, env(safe-area-inset-left, 0px)) !important;
+    right: max(8px, env(safe-area-inset-right, 0px)) !important;
+    width: auto !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+  }
+}
+
+@media (max-width: 420px) {
+  body.ks-kate-mode #page-home-desktop .ks-os-content {
+    padding-left: max(10px, env(safe-area-inset-left, 0px)) !important;
+    padding-right: max(10px, env(safe-area-inset-right, 0px)) !important;
+  }
+  body.ks-kate-mode #page-profile .profile-card {
+    grid-template-columns: 84px minmax(0, 1fr) !important;
+    gap: 8px !important;
+  }
+  body.ks-kate-mode #page-profile .profile-card > * {
+    min-width: 0 !important;
+  }
+  body.ks-kate-mode #page-profile .stat-grid,
+  body.ks-kate-mode #page-home-desktop .ks-os-widget-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  body.ks-kate-mode #page-lobby .games-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+</style>
+
 </body>
 </html>
