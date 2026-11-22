@@ -3171,16 +3171,8 @@ body.lite-mode #machine-grid .game-card,body.lite-mode .ks-machine-paytable-pane
 body.lite-mode .ks-anniversary-hero,body.lite-mode .ks-anniversary-section{backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none}
 </style>
 <style id="kesug-ultimate-local-update-styles">
-/* KESUG ULTIMATE LOCAL UPDATE — profile, notifications, low-cost 3D ambience */
-#ks3d-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.58;transition:opacity .3s ease}
-.ks-os-root>.ks3d-fallback-glow{position:absolute;z-index:0;inset:0;pointer-events:none;opacity:.6;background:radial-gradient(ellipse at 76% 30%,rgba(76,132,178,.15),transparent 28%),radial-gradient(ellipse at 89% 62%,rgba(69,128,220,.13),transparent 23%)}
+/* KESUG ULTIMATE LOCAL UPDATE — profile and local notifications */
 .ks-os-content{z-index:2!important}
-.ks3d-disabled #ks3d-canvas,.lite-mode #ks3d-canvas{display:none!important}
-.ks3d-disabled .ks3d-fallback-glow{opacity:.18}
-#ks3d-settings{display:grid;gap:10px;padding:14px;border:1px solid rgba(135,195,220,.18);border-radius:15px;background:rgba(25,55,75,.28)}
-#ks3d-settings .ks3d-settings-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-#ks3d-settings label{font-size:11px;font-weight:800;color:var(--text-main)}
-#ks3d-settings select{min-width:132px;padding:8px 10px;border:1px solid var(--border);border-radius:9px;background:var(--bg-input);color:var(--text-main);font:700 10px Manrope, sans-serif}
 #ks-notification-button{position:relative;width:38px;height:38px;display:grid;place-items:center;border:1px solid rgba(207,229,255,.18);border-radius:12px;background:rgba(255,255,255,.055);color:#eff7ff;cursor:pointer;font-size:17px}
 #ks-notification-button:hover{background:rgba(255,255,255,.12)}
 #ks-notification-count{position:absolute;right:-5px;top:-5px;min-width:16px;height:16px;display:none;place-items:center;padding:0 4px;border:2px solid #0c1a2a;border-radius:99px;background:#55c89a;color:#071a19;font:900 8px/1 Manrope,sans-serif}
@@ -3217,19 +3209,23 @@ body.lite-mode .ks-anniversary-hero,body.lite-mode .ks-anniversary-section{backd
 .ks-profile-achievements{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:10px}
 .ks-profile-achievement{min-width:0;padding:9px 7px;border:1px solid var(--border);border-radius:11px;background:rgba(0,0,0,.09);opacity:.5;text-align:center}.ks-profile-achievement.is-unlocked{opacity:1;border-color:rgba(var(--accent-rgb),.32);background:var(--accent-soft)}
 .ks-profile-achievement span{display:block;font-size:19px}.ks-profile-achievement strong{display:block;margin-top:5px;color:var(--text-white);font-size:8px;line-height:1.35}.ks-profile-achievement small{display:block;margin-top:3px;color:var(--text-muted);font-size:7px;line-height:1.35}
-/* Hybrid 3D interaction for existing Kesug OS controls and windows. */
-#page-home-desktop .ks-os-app{perspective:850px;transform-style:preserve-3d}
-#page-home-desktop .ks-os-app-icon{transform:translateZ(0);transform-style:preserve-3d;transition:transform .28s cubic-bezier(.2,.8,.2,1),box-shadow .28s ease}
-#page-home-desktop .ks-os-app:hover .ks-os-app-icon{transform:perspective(650px) rotateX(8deg) rotateY(-7deg) translateZ(9px) scale(1.035);box-shadow:0 15px 28px rgba(0,0,0,.32),0 0 22px rgba(90,196,164,.12),inset 0 1px 0 rgba(255,255,255,.42)}
-#page-home-desktop .ks-os-app:active .ks-os-app-icon{transform:perspective(650px) scale(.96) translateZ(-2px)}
-#page-home-desktop .ks-os-app-icon::after{transform:translateZ(2px)}
-#page-home-desktop .ks-os-widget-card,#page-home-desktop .ks-os-machine-panel,#page-home-desktop .ks-os-app-panel{transform-style:preserve-3d;transition:transform .28s ease,box-shadow .28s ease}
-#page-home-desktop .ks-os-widget-card:hover{transform:perspective(1000px) rotateX(1.5deg) translateY(-2px);box-shadow:0 17px 35px rgba(0,0,0,.22)}
-body:not(.lite-mode):not(.ks-os-home-active) .page-view.active{animation:ksUltimatePageIn .32s cubic-bezier(.2,.75,.2,1) both}
-@keyframes ksUltimatePageIn{from{opacity:0;transform:perspective(1200px) rotateX(1.5deg) translateY(10px) scale(.992);filter:blur(2px)}to{opacity:1;transform:perspective(1200px) rotateX(0) translateY(0) scale(1);filter:blur(0)}}
-@media(hover:none){#page-home-desktop .ks-os-app:hover .ks-os-app-icon,#page-home-desktop .ks-os-widget-card:hover{transform:none}}
-@media(prefers-reduced-motion:reduce){#page-home-desktop .ks-os-app-icon,#page-home-desktop .ks-os-widget-card,#page-home-desktop .ks-os-machine-panel,#page-home-desktop .ks-os-app-panel{transition:none!important}body:not(.ks-os-home-active) .page-view.active{animation:none!important}}
-body.lite-mode #page-home-desktop .ks-os-app-icon,body.lite-mode #page-home-desktop .ks-os-widget-card{transition:none!important}
+/* Flat, stable Kate-style dashboard elements: no perspective tilt or hover jumps. */
+#page-home-desktop .ks-os-app,
+#page-home-desktop .ks-os-app-icon,
+#page-home-desktop .ks-os-widget-card,
+#page-home-desktop .ks-os-machine-panel,
+#page-home-desktop .ks-os-app-panel {
+  perspective:none !important;
+  transform:none !important;
+  transform-style:flat !important;
+  transition:background-color .16s ease,border-color .16s ease !important;
+}
+#page-home-desktop .ks-os-app:hover .ks-os-app-icon,
+#page-home-desktop .ks-os-app:active .ks-os-app-icon,
+#page-home-desktop .ks-os-widget-card:hover {
+  transform:none !important;
+  box-shadow:none !important;
+}
 .ks-avatar-motion-float{animation:ksAvatarFloat 4.2s ease-in-out infinite}.ks-avatar-motion-pulse{animation:ksAvatarPulse 2.8s ease-in-out infinite}.ks-avatar-motion-glow{animation:ksAvatarGlow 3.4s ease-in-out infinite}
 @keyframes ksAvatarFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 @keyframes ksAvatarPulse{0%,100%{filter:saturate(1);scale:1}50%{filter:saturate(1.35);scale:1.035}}
@@ -3245,7 +3241,7 @@ body.lite-mode #page-home-desktop .ks-os-app-icon,body.lite-mode #page-home-desk
 .ks-exchange-history{display:grid;gap:7px;margin-top:14px}.ks-exchange-history-row{display:flex;justify-content:space-between;gap:8px;padding:9px;border:1px solid rgba(214,229,242,.09);border-radius:10px;color:rgba(226,238,247,.74);font-size:8px}.ks-exchange-history-row strong{color:#b7e9d5}
 body.lite-mode .ks-profile-ultimate-card,body.lite-mode .ks-notification-panel,body.lite-mode .ks-exchange-panel{backdrop-filter:none!important;box-shadow:none!important}
 body.lite-mode .ks-avatar-motion-float,body.lite-mode .ks-avatar-motion-pulse,body.lite-mode .ks-avatar-motion-glow{animation:none!important;filter:none!important;scale:1!important}
-@media(prefers-reduced-motion:reduce){.ks-avatar-motion-float,.ks-avatar-motion-pulse,.ks-avatar-motion-glow{animation:none!important}#ks3d-canvas{opacity:.25}}
+@media(prefers-reduced-motion:reduce){.ks-avatar-motion-float,.ks-avatar-motion-pulse,.ks-avatar-motion-glow{animation:none!important}}
 @media(max-width:700px){.ks-profile-ultimate{grid-template-columns:minmax(0,1fr)}.ks-profile-ultimate-card.wide{grid-column:auto}.ks-profile-extra-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ks-profile-achievements{grid-template-columns:repeat(2,minmax(0,1fr))}.ks-exchange-form{grid-template-columns:minmax(0,1fr)}.ks-exchange-field.full{grid-column:auto}.ks-notification-panel{max-height:84vh}}
 </style>
 </head>
@@ -11847,7 +11843,6 @@ body[data-ks-wallpaper="none"]::before {
   const ACTIVITY_KEY = 'ks_profile_activity_v2';
   const NOTIFICATION_KEY = 'ks_local_notifications_v1';
   const EXCHANGE_HISTORY_KEY = 'ks_local_exchange_history_v1';
-  const THREE_KEY = 'ks_3d_shell_settings_v1';
 
   /* Local notification center: no push service, server, or account. */
   let notifications = read(NOTIFICATION_KEY, []);
@@ -12057,85 +12052,12 @@ body[data-ks-wallpaper="none"]::before {
   function closeExchange(){const overlay=$('#ks-local-exchange-overlay');if(overlay)overlay.hidden=true;}
   window.ksOpenLocalExchange=openExchange;
 
-  /* Three.js visual desktop layer. It is purely decorative and deliberately low-cost. */
-  let threeSettings=read(THREE_KEY,{enabled:true,quality:'auto'});
-  if(!threeSettings||typeof threeSettings!=='object')threeSettings={enabled:true,quality:'auto'};
-  if(!['auto','low','balanced','high'].includes(threeSettings.quality))threeSettings.quality='auto';
-  if(typeof threeSettings.enabled!=='boolean')threeSettings.enabled=true;
-  let threeModule=null,threeLoading=null,threeRenderer=null,threeScene=null,threeCamera=null,threeGroup=null,threeCanvas=null,threeRaf=0,threeLastFrame=0,threeCurrentQuality='';
-  function resolvedQuality(){
-    if(threeSettings.quality!=='auto')return threeSettings.quality;
-    const mem=Number(navigator.deviceMemory)||0;const cores=Number(navigator.hardwareConcurrency)||0;
-    return (mem&&mem<=4)||(cores&&cores<=4)||matchMedia('(max-width: 700px)').matches?'low':'balanced';
-  }
-  function installThreeCanvas(){
-    const root=$('#ks-os-root');if(!root)return null;
-    if(!threeCanvas){threeCanvas=document.createElement('canvas');threeCanvas.id='ks3d-canvas';threeCanvas.setAttribute('aria-hidden','true');root.insertBefore(threeCanvas,root.firstChild);const glow=document.createElement('div');glow.className='ks3d-fallback-glow';root.insertBefore(glow,threeCanvas.nextSibling);}
-    return root;
-  }
-  function threeRootVisible(){const page=$('#page-home-desktop');return !!(page&&page.classList.contains('active')&&!document.hidden);}
-  function stopThreeLoop(){if(threeRaf){cancelAnimationFrame(threeRaf);threeRaf=0;}}
-  function destroyThree(){stopThreeLoop();if(threeScene){threeScene.traverse(obj=>{if(obj.geometry)obj.geometry.dispose();if(obj.material){if(Array.isArray(obj.material))obj.material.forEach(m=>m.dispose());else obj.material.dispose();}});}if(threeRenderer){threeRenderer.dispose();threeRenderer.forceContextLoss?.();threeRenderer=null;}threeScene=null;threeCamera=null;threeGroup=null;threeCurrentQuality='';}
-  function resizeThree(){if(!threeRenderer||!threeCamera)return;const root=$('#ks-os-root');if(!root)return;const w=Math.max(1,root.clientWidth);const h=Math.max(1,root.clientHeight);threeCamera.aspect=w/h;threeCamera.updateProjectionMatrix();threeRenderer.setSize(w,h,false);}
-  function startThreeLoop(){
-    if(!threeRenderer||threeRaf||!threeRootVisible())return;
-    const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches||document.body.classList.contains('lite-mode')||read(AVATAR_MOTION_KEY,'none')==='__reduce__';
-    if(reduced){threeRenderer.render(threeScene,threeCamera);return;}
-    const frame=now=>{
-      threeRaf=0;
-      if(!threeRenderer||!threeRootVisible())return;
-      const quality=resolvedQuality();const cap=quality==='low'?40:30;
-      if(now-threeLastFrame>=1000/cap){threeLastFrame=now;if(threeGroup){threeGroup.rotation.y+=quality==='low'?.0017:.0024;threeGroup.rotation.x+=.0008;}threeRenderer.render(threeScene,threeCamera);}
-      threeRaf=requestAnimationFrame(frame);
-    };
-    threeRaf=requestAnimationFrame(frame);
-  }
-  async function ensureThree(){
-    const root=installThreeCanvas();if(!root||!threeSettings.enabled||document.body.classList.contains('lite-mode'))return;
-    const quality=resolvedQuality();
-    if(threeRenderer&&threeCurrentQuality!==quality)destroyThree();
-    if(threeRenderer){startThreeLoop();return;}
-    if(!threeModule){
-      if(!threeLoading)threeLoading=import('https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.module.js').then(module=>{threeModule=module;return module;}).catch(error=>{root.classList.add('ks3d-fallback');console.warn('Kesug 3D: Three.js недоступен, используется лёгкий фон.',error);return null;}).finally(()=>{threeLoading=null;});
-      threeModule=await threeLoading;
-    }
-    if(!threeModule||!threeSettings.enabled||document.body.classList.contains('lite-mode'))return;
-    const THREE=threeModule;
-    try{
-      const low=quality==='low';
-      threeRenderer=new THREE.WebGLRenderer({canvas:threeCanvas,alpha:true,antialias:!low,powerPreference:'low-power',stencil:false,depth:true});
-      threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio||1,low?1:quality==='high'?1.45:1.15));
-      threeRenderer.setClearColor(0x000000,0);
-      threeScene=new THREE.Scene();
-      threeCamera=new THREE.PerspectiveCamera(43,1,.1,60);threeCamera.position.set(0,0,8);
-      threeGroup=new THREE.Group();threeGroup.position.set(2.5,.15,0);threeScene.add(threeGroup);
-      threeScene.add(new THREE.AmbientLight(0x9aafc5,1.25));
-      const light=new THREE.PointLight(0x5b9ed5,20,20);light.position.set(3,3,5);threeScene.add(light);
-      const core=new THREE.Mesh(new THREE.IcosahedronGeometry(.92,low?1:2),new THREE.MeshStandardMaterial({color:0x6488aa,metalness:.58,roughness:.30,wireframe:true,transparent:true,opacity:.68}));threeGroup.add(core);
-      const ring=new THREE.Mesh(new THREE.TorusGeometry(1.48,.014,low?5:8,low?44:84),new THREE.MeshBasicMaterial({color:0x91b9dc,transparent:true,opacity:.34}));ring.rotation.set(.8,.15,.25);threeGroup.add(ring);
-      const orb=new THREE.Mesh(new THREE.OctahedronGeometry(.23,0),new THREE.MeshStandardMaterial({color:0x8bb8ff,metalness:.4,roughness:.26,emissive:0x173c54}));orb.position.set(-1.55,.95,.1);threeGroup.add(orb);
-      const count=low?22:52;const positions=new Float32Array(count*3);
-      for(let i=0;i<count;i++){const angle=Math.random()*Math.PI*2;const radius=2.0+Math.random()*2.6;positions[i*3]=Math.cos(angle)*radius;positions[i*3+1]=(Math.random()-.5)*3.2;positions[i*3+2]=(Math.random()-.5)*2.0;}
-      const pointsGeometry=new THREE.BufferGeometry();pointsGeometry.setAttribute('position',new THREE.BufferAttribute(positions,3));
-      threeScene.add(new THREE.Points(pointsGeometry,new THREE.PointsMaterial({color:0x9abfe0,size:low?0.025:0.035,transparent:true,opacity:.38,sizeAttenuation:true})));
-      threeCurrentQuality=quality;root.classList.remove('ks3d-fallback');resizeThree();startThreeLoop();
-    }catch(error){destroyThree();root.classList.add('ks3d-fallback');console.warn('Kesug 3D: не удалось создать WebGL-сцену.',error);}
-  }
-  function syncThree(){
-    const root=installThreeCanvas();if(!root)return;
-    root.classList.toggle('ks3d-disabled',!threeSettings.enabled);
-    if(!threeSettings.enabled||document.body.classList.contains('lite-mode')){stopThreeLoop();if(threeCanvas)threeCanvas.style.display='none';return;}
-    if(threeCanvas)threeCanvas.style.display='block';
-    ensureThree();
-  }
-  function saveThreeSettings(){write(THREE_KEY,threeSettings);syncThree();}
-  function installThreeSettings(){
-    const scroll=$('.ks-os-settings-scroll');if(!scroll||$('#ks3d-settings'))return;
-    const footer=$('.ks-os-settings-footer',scroll);
-    const section=document.createElement('section');section.className='ks-os-settings-section';section.innerHTML=`<h3><i class="ph-fill ph-cube"></i> 3D-интерфейс Three.js</h3><div id="ks3d-settings"><div class="ks3d-settings-row"><label for="ks3d-enabled">Объёмный фон рабочего стола</label><input id="ks3d-enabled" type="checkbox" ${threeSettings.enabled?'checked':''}></div><div class="ks3d-settings-row"><label for="ks3d-quality">Качество 3D-графики</label><select id="ks3d-quality"><option value="auto" ${threeSettings.quality==='auto'?'selected':''}>Авто</option><option value="low" ${threeSettings.quality==='low'?'selected':''}>Низкое</option><option value="balanced" ${threeSettings.quality==='balanced'?'selected':''}>Среднее</option><option value="high" ${threeSettings.quality==='high'?'selected':''}>Высокое</option></select></div><p style="margin:0;color:var(--text-muted);font-size:9px;line-height:1.5">3D-сцена декоративная. На слабых устройствах автоматически выбирается низкая нагрузка; в Lite Mode она отключается.</p></div>`;
-    if(footer)scroll.insertBefore(section,footer);else scroll.append(section);
-    $('#ks3d-enabled',section)?.addEventListener('change',event=>{threeSettings.enabled=!!event.target.checked;saveThreeSettings();notify('Three.js',threeSettings.enabled?'3D-фон рабочего стола включён.':'3D-фон рабочего стола выключен.');});
-    $('#ks3d-quality',section)?.addEventListener('change',event=>{threeSettings.quality=event.target.value;saveThreeSettings();});
+  function removeLegacyThreeNodes(){
+    document.getElementById('ks3d-canvas')?.remove();
+    document.querySelectorAll('.ks3d-fallback-glow').forEach(node=>node.remove());
+    const root=$('#ks-os-root');
+    root?.classList.remove('ks3d-disabled','ks3d-fallback');
+    try{localStorage.removeItem('ks_3d_shell_settings_v1');}catch(_){}
   }
 
   function installExchangeEntry(){
@@ -12153,13 +12075,13 @@ body[data-ks-wallpaper="none"]::before {
   }
 
   function installEverything(){
-    installNotificationUI();installProfilePanel();installThreeSettings();installExchangeEntry();installThreeCanvas();syncThree();applyAvatarMotion();
+    removeLegacyThreeNodes();installNotificationUI();installProfilePanel();installExchangeEntry();applyAvatarMotion();
   }
 
   /* Hook only navigation/decoration events; the existing game state and round system are untouched. */
   let lastTrackedPage='';
   const baseShowPage=window.showPage;
-  if(typeof baseShowPage==='function')window.showPage=function(id,...args){const result=baseShowPage.call(this,id,...args);if(id && id!==lastTrackedPage){activity.pageVisits+=1;lastTrackedPage=id;saveActivity();}if(id==='profile'){installProfilePanel();renderProfileUltimate();}/* Three.js stays mounted; route changes must not restart its renderer. */return result;};
+  if(typeof baseShowPage==='function')window.showPage=function(id,...args){const result=baseShowPage.call(this,id,...args);if(id && id!==lastTrackedPage){activity.pageVisits+=1;lastTrackedPage=id;saveActivity();}if(id==='profile'){installProfilePanel();renderProfileUltimate();}return result;};
   const baseUpdateProfile=window.updateProfileUI;
   if(typeof baseUpdateProfile==='function')window.updateProfileUI=function(...args){const result=baseUpdateProfile.apply(this,args);applyAvatarMotion();return result;};
   const baseUseMore=window.useMoreFeature;
@@ -12167,23 +12089,15 @@ body[data-ks-wallpaper="none"]::before {
   const baseBanner=window.chooseKesugBanner;
   if(typeof baseBanner==='function')window.chooseKesugBanner=function(id,...args){const result=baseBanner.call(this,id,...args);notify('Обложка профиля','Обложка профиля обновлена.');renderProfileUltimate();return result;};
   const baseSetPage=window.ksOSGo;
-  if(typeof baseSetPage==='function')window.ksOSGo=function(id,...args){const result=baseSetPage.call(this,id,...args);/* Three.js is not restarted by navigation. */return result;};
+  if(typeof baseSetPage==='function')window.ksOSGo=function(id,...args){const result=baseSetPage.call(this,id,...args);return result;};
 
-  const mutationObserver=new MutationObserver(()=>{
-    const lite=document.body.classList.contains('lite-mode');
-    if(lite){stopThreeLoop();if(threeCanvas)threeCanvas.style.display='none';}
-    else if(threeSettings.enabled&&threeCanvas){threeCanvas.style.display='block';if(threeRootVisible())startThreeLoop();}
-  });
-  mutationObserver.observe(document.body,{attributes:true,attributeFilter:['class']});
-  document.addEventListener('visibilitychange',()=>{if(document.hidden)stopThreeLoop();else syncThree();});
-  window.addEventListener('resize',resizeThree,{passive:true});
   window.addEventListener('keydown',event=>{if(event.key==='Escape')closeExchange();});
   setInterval(()=>{if($('#ks-profile-ultimate')&&$('#page-profile')?.classList.contains('active')){const stats=$('#ks-profile-ultimate .ks-profile-extra-stat-grid');if(stats){const cells=stats.querySelectorAll('strong');if(cells[0])cells[0].textContent=formatDuration(activity.seconds);if(cells[1])cells[1].textContent=fmt(activity.activeDays);}}},30000);
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',installEverything,{once:true});else setTimeout(installEverything,0);
 })();
 </script>
-<!-- KESUG 3D DEPTH + COSMETIC WORKSHOP + VISUAL PICKERS -->
+<!-- KESUG profile enhancements and visual interface -->
 <style id="kesug-kate-classic-v7">
 :root{
   --kate-header-height:46px;
@@ -14048,11 +13962,7 @@ body.ks-kate-mode .content-wrapper > main,
 body.ks-kate-mode .page-view { min-width:0 !important; box-sizing:border-box !important; }
 body.ks-kate-mode .page-view :where(*, *::before, *::after) { box-sizing:border-box; }
 
-/* Remove the old green fallback glow and keep the desktop scene cool/neutral. */
-body.ks-kate-mode #page-home-desktop .ks-os-root > .ks3d-fallback-glow {
-  display:none !important; opacity:0 !important; background:none !important;
-}
-body.ks-kate-mode #page-home-desktop #ks3d-canvas { opacity:.34 !important; }
+/* Decorative WebGL canvas removed; the dashboard uses a stable CSS wallpaper. */
 
 /* A slot's large outer panel is a steady graphite surface, not machine-accent green. */
 body.ks-kate-mode #game-screen {
@@ -15259,6 +15169,30 @@ body.ks-kate-mode .ks-kate-origin-backdrop {
   window.addEventListener('resize', sync, {passive:true});
   window.addEventListener('orientationchange', sync, {passive:true});
   if (window.visualViewport) window.visualViewport.addEventListener('resize', sync, {passive:true});
+})();
+</script>
+
+
+<style id="kesug-v21-remove-three-completely">
+/* Three.js is removed entirely. Keep the desktop background as ordinary CSS. */
+#ks3d-canvas, .ks3d-fallback-glow, #ks3d-settings { display:none !important; }
+#page-home-desktop .ks-os-root { isolation:isolate !important; }
+#page-home-desktop .ks-os-content { position:relative !important; z-index:1 !important; }
+#page-home-desktop .ks-os-widget-card:hover,
+#page-home-desktop .ks-os-app:hover .ks-os-app-icon { transform:none !important; box-shadow:none !important; }
+</style>
+<script id="kesug-v21-remove-three-cleanup">
+(() => {
+  const cleanup = () => {
+    document.getElementById('ks3d-canvas')?.remove();
+    document.querySelectorAll('.ks3d-fallback-glow').forEach(node => node.remove());
+    document.getElementById('ks3d-settings')?.closest('.ks-os-settings-section')?.remove();
+    const root = document.getElementById('ks-os-root');
+    root?.classList.remove('ks3d-disabled', 'ks3d-fallback');
+    try { localStorage.removeItem('ks_3d_shell_settings_v1'); } catch (_) {}
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', cleanup, { once:true });
+  else cleanup();
 })();
 </script>
 
