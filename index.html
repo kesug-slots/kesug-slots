@@ -14959,5 +14959,308 @@ body.ks-kate-mode .ks-kate-origin-backdrop {
 }
 </style>
 
+
+
+<style id="kesug-v20-hard-mobile-fit">
+/* v20: mobile viewport containment. The viewport clips only the page root;
+   inner content is allowed to grow vertically and never gets cut at its own edge. */
+@media (max-width: 899px) {
+  html {
+    width:100% !important;
+    max-width:100% !important;
+    margin:0 !important;
+    overflow-x:hidden !important;
+    overscroll-behavior-x:none !important;
+  }
+  body.ks-kate-mode {
+    position:relative !important;
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+  }
+  body.ks-kate-mode,
+  body.ks-kate-mode :where(*, *::before, *::after) {
+    box-sizing:border-box !important;
+  }
+  body.ks-kate-mode #ks-kate-header {
+    position:fixed !important;
+    inset:0 0 auto 0 !important;
+    width:auto !important;
+    max-width:none !important;
+    min-width:0 !important;
+    padding-left:max(10px, env(safe-area-inset-left, 0px)) !important;
+    padding-right:max(10px, env(safe-area-inset-right, 0px)) !important;
+    z-index:18000 !important;
+  }
+  body.ks-kate-mode #ks-kate-header .ks-kate-header-title {
+    flex:1 1 auto !important;
+    min-width:0 !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+  }
+  body.ks-kate-mode #ks-kate-mobile-menu {
+    flex:0 0 38px !important;
+    width:38px !important;
+    min-width:38px !important;
+    max-width:38px !important;
+  }
+  body.ks-kate-mode .content-wrapper,
+  body.ks-kate-mode.ks-kate-sidebar-collapsed .content-wrapper,
+  body.ks-kate-mode .content-wrapper > main {
+    display:block !important;
+    position:relative !important;
+    inset:auto !important;
+    float:none !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    margin:0 !important;
+    padding:var(--kate-header-height, 54px) 0 0 !important;
+    overflow:visible !important;
+    transform:none !important;
+  }
+  body.ks-kate-mode .page-view,
+  body.ks-kate-mode .page-view.active {
+    position:relative !important;
+    inset:auto !important;
+    float:none !important;
+    display:block !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    height:auto !important;
+    min-height:calc(100dvh - var(--kate-header-height, 54px)) !important;
+    max-height:none !important;
+    margin:0 !important;
+    padding:12px max(10px, env(safe-area-inset-left, 0px)) calc(28px + env(safe-area-inset-bottom, 0px)) max(10px, env(safe-area-inset-right, 0px)) !important;
+    overflow:visible !important;
+    transform:none !important;
+  }
+  body.ks-kate-mode .page-view:not(.active) {
+    display:none !important;
+  }
+  body.ks-kate-mode .page-view > *,
+  body.ks-kate-mode .page-view :where(.ks-os-root, .ks-os-content, .ks-os-main,
+      .ks-os-left-column, .ks-os-right-column, .ks-os-widgets, .ks-os-widget-card,
+      .games-grid, .game-card, .stat-grid, .stat-card, .ks-duel-boards,
+      .ks-duel-setup-grid, .ks-music-link-fields, .ks-analytics-grid,
+      .ks-analytics-card, .ks-more-wide-grid, .ks-more-row, .profile-card,
+      .profile-info, .profile-actions, .profile-data-panel) {
+    min-width:0 !important;
+    max-width:100% !important;
+  }
+  body.ks-kate-mode #page-home-desktop,
+  body.ks-kate-mode #page-home-desktop .ks-os-root,
+  body.ks-kate-mode #page-home-desktop .ks-os-content,
+  body.ks-kate-mode #page-home-desktop .ks-os-main,
+  body.ks-kate-mode #page-home-desktop .ks-os-left-column,
+  body.ks-kate-mode #page-home-desktop .ks-os-right-column,
+  body.ks-kate-mode #page-home-desktop .ks-os-widgets,
+  body.ks-kate-mode #page-home-desktop .ks-os-widget-card {
+    display:block !important;
+    position:relative !important;
+    inset:auto !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    margin-left:0 !important;
+    margin-right:0 !important;
+    transform:none !important;
+  }
+  body.ks-kate-mode #page-home-desktop .ks-os-content {
+    padding-left:0 !important;
+    padding-right:0 !important;
+  }
+  body.ks-kate-mode #page-home-desktop .ks-os-widgets {
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) !important;
+    grid-auto-columns:minmax(0,1fr) !important;
+    gap:0 !important;
+    align-items:stretch !important;
+  }
+  body.ks-kate-mode #page-home-desktop .ks-os-widget-card,
+  body.ks-kate-mode #page-home-desktop .ks-os-widget-card.wide {
+    grid-column:1 / -1 !important;
+    padding:12px 4px !important;
+    overflow:visible !important;
+    white-space:normal !important;
+  }
+  body.ks-kate-mode #page-home-desktop .ks-os-widget-card :where(*, *::before, *::after) {
+    min-width:0 !important;
+    max-width:100% !important;
+    overflow-wrap:anywhere !important;
+  }
+  body.ks-kate-mode .page-view :where(.games-grid, .ks-duel-boards,
+      .ks-duel-setup-grid, .ks-music-link-fields, .ks-analytics-grid,
+      .stat-grid, .ks-os-widget-stats, .ks-more-wide-grid) {
+    display:grid !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    grid-template-columns:repeat(2, minmax(0,1fr)) !important;
+    gap:8px !important;
+  }
+  body.ks-kate-mode .page-view :where(.game-card, .ks-duel-card,
+      .ks-music-track-row, .ks-analytics-card, .ks-more-row,
+      .stat-card, .profile-card, .profile-info, .profile-actions,
+      .profile-data-panel) {
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    margin-left:0 !important;
+    margin-right:0 !important;
+    overflow-wrap:anywhere !important;
+  }
+  body.ks-kate-mode .page-view :where(.game-card, .ks-duel-card,
+      .ks-music-track-row, .ks-analytics-card, .ks-more-row) {
+    height:auto !important;
+    min-height:0 !important;
+  }
+  body.ks-kate-mode .page-view :where(.flex-row, .row, [class*="-row"],
+      .ks-os-widget-actions, .profile-actions, .profile-data-actions) {
+    min-width:0 !important;
+    max-width:100% !important;
+    flex-wrap:wrap !important;
+  }
+  body.ks-kate-mode .page-view :where(input, select, textarea, button) {
+    min-width:0 !important;
+    max-width:100% !important;
+    box-sizing:border-box !important;
+  }
+  body.ks-kate-mode .page-view :where(img, video, canvas, svg, iframe) {
+    max-width:100% !important;
+  }
+  body.ks-kate-mode #page-profile .profile-card {
+    display:grid !important;
+    grid-template-columns:clamp(76px, 24vw, 112px) minmax(0,1fr) !important;
+    gap:8px !important;
+  }
+  body.ks-kate-mode #page-profile .profile-avatar {
+    width:100% !important;
+    max-width:112px !important;
+    height:auto !important;
+    aspect-ratio:1 / 1 !important;
+  }
+  body.ks-kate-mode #page-profile .stat-grid,
+  body.ks-kate-mode #page-profile .stat-grid.ks-profile-stats {
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+  body.ks-kate-mode #ks-kate-sidebar {
+    position:fixed !important;
+    top:var(--kate-header-height,54px) !important;
+    bottom:0 !important;
+    left:0 !important;
+    right:auto !important;
+    width:min(286px, calc(100% - 20px)) !important;
+    max-width:calc(100% - 20px) !important;
+    box-sizing:border-box !important;
+  }
+  body.ks-kate-mode #ks-kate-backdrop {
+    position:fixed !important;
+    top:var(--kate-header-height,54px) !important;
+    right:0 !important;
+    bottom:0 !important;
+    left:0 !important;
+    width:auto !important;
+    max-width:none !important;
+  }
+  body.ks-kate-mode #game-screen,
+  body.ks-kate-mode.ks-kate-sidebar-collapsed #game-screen {
+    position:fixed !important;
+    inset:0 !important;
+    width:auto !important;
+    min-width:0 !important;
+    max-width:none !important;
+    padding:calc(var(--kate-header-height,54px) + 10px) max(10px, env(safe-area-inset-left,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(10px, env(safe-area-inset-right,0px)) !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+  }
+  body.ks-kate-mode #game-screen > .slot-container,
+  body.ks-kate-mode #game-screen > .game-header {
+    position:relative !important;
+    width:min(100%, 540px) !important;
+    min-width:0 !important;
+    max-width:540px !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+  }
+  body.ks-kate-mode #game-screen .reels,
+  body.ks-kate-mode #game-screen .reel-window,
+  body.ks-kate-mode #game-screen .bet-box,
+  body.ks-kate-mode #game-screen .bet-btns {
+    min-width:0 !important;
+    max-width:100% !important;
+    box-sizing:border-box !important;
+  }
+  body.ks-kate-mode #ks-os-settings-panel,
+  body.ks-kate-mode .ks-kate-origin-dialog {
+    position:fixed !important;
+    top:calc(var(--kate-header-height,54px) + 8px) !important;
+    right:max(8px, env(safe-area-inset-right,0px)) !important;
+    bottom:max(8px, env(safe-area-inset-bottom,0px)) !important;
+    left:max(8px, env(safe-area-inset-left,0px)) !important;
+    width:auto !important;
+    min-width:0 !important;
+    max-width:none !important;
+    max-height:none !important;
+    overflow:hidden !important;
+  }
+  body.ks-kate-mode #ks-os-settings-panel .ks-os-settings-scroll {
+    min-width:0 !important;
+    max-width:100% !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+  }
+}
+@media (max-width: 390px) {
+  body.ks-kate-mode .page-view :where(.games-grid, .ks-duel-boards,
+      .ks-duel-setup-grid, .ks-music-link-fields, .ks-analytics-grid,
+      .stat-grid, .ks-os-widget-stats, .ks-more-wide-grid) {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+  body.ks-kate-mode #page-profile .profile-card {
+    grid-template-columns:72px minmax(0,1fr) !important;
+  }
+}
+@media (max-width: 350px) {
+  body.ks-kate-mode .page-view { padding-left:8px !important; padding-right:8px !important; }
+  body.ks-kate-mode #ks-kate-header { padding-left:8px !important; padding-right:8px !important; }
+  body.ks-kate-mode #page-profile .profile-card { grid-template-columns:64px minmax(0,1fr) !important; }
+}
+</style>
+
+<script id="kesug-v20-mobile-viewport-guard">
+(() => {
+  'use strict';
+  const body = document.body;
+  const sync = () => {
+    const mobile = window.matchMedia('(max-width: 899px)').matches;
+    body.classList.toggle('ks-kate-mobile-v20', mobile);
+    if (!mobile) return;
+    const width = document.documentElement.clientWidth || window.innerWidth;
+    document.documentElement.style.setProperty('--ks-kate-visible-width', `${width}px`);
+    // Clear legacy inline geometry on page roots that used desktop viewport units.
+    for (const selector of ['.content-wrapper', '.content-wrapper > main', '.page-view.active', '#page-home-desktop']) {
+      const element = document.querySelector(selector);
+      if (!element) continue;
+      element.style.setProperty('max-width', '100%', 'important');
+      element.style.setProperty('min-width', '0', 'important');
+      if (selector !== '#page-home-desktop') element.style.setProperty('margin-left', '0', 'important');
+      if (selector !== '#page-home-desktop') element.style.setProperty('margin-right', '0', 'important');
+    }
+  };
+  sync();
+  window.addEventListener('resize', sync, {passive:true});
+  window.addEventListener('orientationchange', sync, {passive:true});
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', sync, {passive:true});
+})();
+</script>
+
 </body>
 </html>
