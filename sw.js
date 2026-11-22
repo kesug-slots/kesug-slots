@@ -1,7 +1,7 @@
 /* Kesug Slots — v18 reliable offline-first Service Worker. */
 'use strict';
 
-const VERSION = 'kesug-kate-classic-v18-reliable-cache-2026-11-22';
+const VERSION = 'kesug-kate-mobile-edge-v19-2026-11-22';
 const SHELL_CACHE = `${VERSION}-shell`;
 const CODE_CACHE = `${VERSION}-code`;
 const ASSET_CACHE = `${VERSION}-assets`;
