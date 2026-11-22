@@ -1,7 +1,7 @@
-/* Kesug Slots — v20 mobile viewport fix — network-first offline-first Service Worker. */
+/* Kesug Slots — v21 Three.js removal — network-first offline-first Service Worker. */
 'use strict';
 
-const VERSION = 'kesug-kate-mobile-edge-v20-2026-11-22';
+const VERSION = 'kesug-kate-no-three-v21-2026-11-22';
 const SHELL_CACHE = `${VERSION}-shell`;
 const CODE_CACHE = `${VERSION}-code`;
 const ASSET_CACHE = `${VERSION}-assets`;
@@ -21,6 +21,7 @@ const OWN_CACHE_PREFIXES = [
   'kesug-kate-windows-motion-',
   'kesug-kate-stable-tabs-',
   'kesug-kate-mobile-edge-',
+  'kesug-kate-no-three-',
   'kesug-slots-'
 ];
 
