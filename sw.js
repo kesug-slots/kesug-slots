@@ -1,5 +1,5 @@
-/* Kesug Slots V29.2 mobile/color fix. */
-const CACHE_VERSION='kesug-slots-v29-2';
+/* Kesug Slots V30.2 mobile reel stability release. */
+const CACHE_VERSION='kesug-slots-v30-2';
 const SHELL_CACHE=`${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE=`${CACHE_VERSION}-runtime`;
 const PRECACHE_URLS=[
