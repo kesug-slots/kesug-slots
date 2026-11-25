@@ -20,7 +20,7 @@
 })();</script>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
-<title>Kesug Slots — Silver Glass V29.2</title>
+<title>Kesug Slots — Silver Glass V30.1 · Mobile Reel Fix</title>
 <meta content="#17181b" name="theme-color"/>
 <meta content="Kesug Slots" name="application-name"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
@@ -3765,6 +3765,19 @@ body.lite-mode .ks-avatar-motion-float,body.lite-mode .ks-avatar-motion-pulse,bo
 <button class="back-btn-game" onclick="closeMachine()"><i class="ph-bold ph-arrow-left"></i> Назад</button>
 </div>
 <div class="slot-container">
+<div class="ks-win-island" id="ks-win-island" aria-live="polite" aria-atomic="true" aria-hidden="true">
+  <div class="ks-win-island__clip">
+    <div class="ks-win-island__surface">
+      <div class="ks-win-island__topline">
+        <span class="ks-win-island__icon" aria-hidden="true"><i class="ph-fill ph-trophy"></i></span>
+        <span class="ks-win-island__caption" id="ks-win-island-caption">KESUG · РЕЗУЛЬТАТ</span>
+        <span class="ks-win-island__badge" id="ks-win-island-badge">WIN</span>
+      </div>
+      <div class="ks-win-island__amount"><span aria-hidden="true">+</span><strong id="ks-win-island-amount">0</strong></div>
+      <div class="ks-win-island__footer" id="ks-win-island-footer">ВИРТУАЛЬНЫХ ОЧКОВ</div>
+    </div>
+  </div>
+</div>
 <div aria-label="Текущий баланс" class="machine-balance-card">
 <div class="machine-balance-label">
 <i aria-hidden="true" class="ph-bold ph-wallet"></i>
@@ -4755,11 +4768,13 @@ window.spin = () => {
 
   const syms = currentMachine.symbols;
   const result = generateResult(syms, currentMachine);
-  const reelHeight = document.querySelector('.reel-window').offsetHeight / 3;
-  const ITEMS = 8; // shorter reel strip: fewer live image nodes per spin
+  const ITEMS = 8; // eight passing symbols followed by the final three result symbols
   const LITE_MODE = document.body.classList.contains('lite-mode');
   const DURATION = LITE_MODE ? 1850 : 2850;
 
+  // Rebuild each reel strip first. The rendered cell height is measured from an actual
+  // .reel-item, not inferred from reel-window / 3: older mobile CSS had different
+  // --reel-h and reel-window heights, so the strip travelled farther than its content.
   for (let col = 0; col < 3; col++) {
     const strip = document.getElementById('reel-' + col);
     const reelSymbols = [];
@@ -4767,18 +4782,66 @@ window.spin = () => {
     reelSymbols.push(result[col], result[col + 3], result[col + 6]);
     window.ksSetReelSymbols(strip, reelSymbols);
     strip.style.transition = 'none';
-    strip.style.transform = 'translateY(0)';
+    strip.style.transform = 'translate3d(0, 0, 0)';
   }
 
-  void document.body.offsetHeight;
+  const firstCell = document.querySelector('#reel-0 .reel-item');
+  const measuredCellHeight = firstCell ? firstCell.getBoundingClientRect().height : 0;
+  const reelHeight = Number.isFinite(measuredCellHeight) && measuredCellHeight > 0
+    ? measuredCellHeight
+    : (parseFloat(getComputedStyle(document.querySelector('#reel-0')).getPropertyValue('--reel-h')) || 60);
+
+  // Force every viewport to exactly three rendered cells. This keeps the final
+  // three symbols inside the window on iOS Safari even when legacy media queries
+  // set a different height on .reel-window and --reel-h.
+  document.querySelectorAll('#main-reels .reel-window').forEach(windowEl => {
+    const cs = getComputedStyle(windowEl);
+    const extras = ['borderTopWidth','borderBottomWidth','paddingTop','paddingBottom']
+      .reduce((sum, key) => sum + (parseFloat(cs[key]) || 0), 0);
+    const exactWindowHeight = Math.ceil(reelHeight * 3 + extras);
+    windowEl.style.setProperty('height', `${exactWindowHeight}px`, 'important');
+    windowEl.style.setProperty('min-height', `${exactWindowHeight}px`, 'important');
+    windowEl.style.setProperty('max-height', `${exactWindowHeight}px`, 'important');
+    // Overflow already clips the reel; paint containment can blank transformed
+    // children on some mobile WebKit versions, so keep only layout/style containment.
+    windowEl.style.setProperty('contain', 'layout style', 'important');
+  });
 
   for (let col = 0; col < 3; col++) {
     const strip = document.getElementById('reel-' + col);
-    strip.style.transition = `transform ${DURATION}ms cubic-bezier(0.1, 0.7, 0.1, 1) ${col * 230}ms`;
-    strip.style.transform = `translateY(-${ITEMS * reelHeight}px)`;
+    strip.querySelectorAll('.reel-item').forEach(cell => {
+      cell.style.setProperty('height', `${reelHeight}px`, 'important');
+      cell.style.setProperty('min-height', `${reelHeight}px`, 'important');
+      cell.style.setProperty('max-height', `${reelHeight}px`, 'important');
+      cell.style.setProperty('flex', `0 0 ${reelHeight}px`, 'important');
+      const image = cell.querySelector('img');
+      if (image) {
+        image.style.setProperty('display', 'block', 'important');
+        image.style.setProperty('visibility', 'visible', 'important');
+        image.style.setProperty('opacity', '1', 'important');
+        image.style.setProperty('contain', 'none', 'important');
+        image.style.setProperty('transform', 'none', 'important');
+      }
+    });
+    strip.style.height = `${reelHeight * (ITEMS + 3)}px`;
+    strip.style.willChange = 'transform';
   }
 
-  setTimeout(() => { checkWin(result); }, DURATION + 850);
+  // Commit the reset layout before starting the transition. Translate by the
+  // actual cell height so exactly the three result symbols remain in the window.
+  void document.getElementById('main-reels').offsetHeight;
+
+  requestAnimationFrame(() => {
+    for (let col = 0; col < 3; col++) {
+      const strip = document.getElementById('reel-' + col);
+      if (!strip) continue;
+      strip.style.transition = `transform ${DURATION}ms cubic-bezier(0.1, 0.7, 0.1, 1) ${col * 230}ms`;
+      strip.style.transform = `translate3d(0, -${ITEMS * reelHeight}px, 0)`;
+    }
+  });
+
+  // The third reel has a 460 ms stagger. Check the result only after its motion settles.
+  setTimeout(() => { checkWin(result); }, DURATION + 460 + 240);
 };
 
 function checkWin(res) {
@@ -4813,16 +4876,9 @@ function checkWin(res) {
     if (win > state.stats.maxWin) state.stats.maxWin = win;
     saveToLocal(); updateUI();
     
-    // Красивый показ выигрыша
+    // Win Island is scoped to the current machine screen; no full-screen popup.
     const isMega = win >= (currentPayoutStake || Math.min(state.bet, SLOT_PAYOUT_CAP)) * 20;
-    const popup = document.getElementById('win-popup');
-    
-    popup.classList.toggle('mega', isMega);
-    document.getElementById('win-title').textContent = isMega ? 'MEGA WIN' : 'WIN';
-    document.getElementById('win-amount').textContent = win.toLocaleString('ru-RU') + ' ₽';
-    
-    popup.classList.add('active');
-    setTimeout(() => popup.classList.remove('active'), 2500);
+    window.ksShowWinIsland?.(win, isMega, currentMachine);
   }
 
   isSpinning = false;
@@ -10531,15 +10587,38 @@ body.lite-mode *,body.lite-mode *::before,body.lite-mode *::after {
     searchTimer = window.setTimeout(renderLobbyOptimized,110);
   };
 
-  /* Reuse the same small reel DOM on every spin; only swap already-known image URLs. */
+  function symbolFallbackUrl(symbol) {
+    const safe = String(symbol || '✦').replace(/[<>&"']/g, '');
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><defs><radialGradient id="b"><stop stop-color="#ffffff" stop-opacity=".32"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient><linearGradient id="p" x2="0" y2="1"><stop stop-color="#555b68"/><stop offset="1" stop-color="#20232a"/></linearGradient></defs><circle cx="128" cy="128" r="116" fill="url(#p)"/><circle cx="90" cy="72" r="110" fill="url(#b)"/><text x="128" y="174" text-anchor="middle" font-size="142" font-family="Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,sans-serif">${safe}</text></svg>`;
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+  }
+  function bindReelImage(image, symbol) {
+    image.alt = String(symbol || '');
+    image.decoding = 'sync';
+    image.loading = 'eager';
+    image.fetchPriority = 'high';
+    image.width = 80;
+    image.height = 80;
+    image.onerror = () => {
+      if (image.dataset.ksFallbackApplied === '1') return;
+      image.dataset.ksFallbackApplied = '1';
+      image.onerror = null;
+      image.src = symbolFallbackUrl(symbol);
+    };
+    const url = getIconUrl(symbol);
+    image.src = symbolImageStatus.get(url) === false ? symbolFallbackUrl(symbol) : url;
+  }
+
+  /* Reuse the same small reel DOM on every spin; the spin gate decodes the images first. */
   window.ksSetReelSymbols = (strip,symbols) => {
     if (!strip || !Array.isArray(symbols)) return;
     if (strip.children.length !== symbols.length) {
       const fragment = document.createDocumentFragment();
       symbols.forEach(symbol => {
         const cell = document.createElement('div'); cell.className='reel-item';
-        const image = document.createElement('img'); image.alt=''; image.decoding='async'; image.loading='eager'; image.width=80; image.height=80;
-        image.src = getIconUrl(symbol); cell.appendChild(image); fragment.appendChild(cell);
+        const image = document.createElement('img');
+        bindReelImage(image,symbol);
+        cell.appendChild(image); fragment.appendChild(cell);
       });
       strip.replaceChildren(fragment);
     } else {
@@ -10547,29 +10626,43 @@ body.lite-mode *,body.lite-mode *::before,body.lite-mode *::after {
         const image = cell.querySelector('img');
         const url = getIconUrl(symbols[index]);
         if (image && image.getAttribute('src') !== url) {
-          const token = String((Number(image.dataset.ksSwapToken) || 0) + 1);
-          image.dataset.ksSwapToken = token;
-          preloadSymbolImage(url).then(loaded => {
-            if (loaded && image.dataset.ksSwapToken === token) image.src = url;
-          });
+          image.dataset.ksFallbackApplied = '';
+          bindReelImage(image,symbols[index]);
         }
         cell.classList.remove('winning');
       });
     }
   };
 
-  /* Preload only the selected machine's symbols in parallel; never warm the full library at startup. */
+  /* Preload and decode only the selected machine's symbols before the first mobile frame. */
   const symbolImageLoads = new Map();
+  const symbolImageStatus = new Map();
   function preloadSymbolImage(url) {
     if (!url) return Promise.resolve(false);
     if (symbolImageLoads.has(url)) return symbolImageLoads.get(url);
     const promise = new Promise(resolve => {
       const image = new Image();
+      let settled = false;
+      let timeout = 0;
+      const finish = async loaded => {
+        if (settled) return;
+        settled = true;
+        if (timeout) clearTimeout(timeout);
+        if (loaded && typeof image.decode === 'function') {
+          try { await image.decode(); } catch (_) { /* onload already confirms a usable decoded resource */ }
+        }
+        const usable = Boolean(loaded && image.naturalWidth > 0);
+        symbolImageStatus.set(url,usable);
+        resolve(usable);
+      };
       image.decoding = 'async';
-      image.onload = () => resolve(true);
-      image.onerror = () => resolve(false);
+      image.loading = 'eager';
+      image.fetchPriority = 'high';
+      image.onload = () => finish(true);
+      image.onerror = () => finish(false);
+      timeout = setTimeout(() => finish(image.complete && image.naturalWidth > 0), 7000);
       image.src = url;
-      if (image.complete) resolve(image.naturalWidth > 0);
+      if (image.complete) finish(image.naturalWidth > 0);
     });
     symbolImageLoads.set(url,promise);
     return promise;
@@ -10579,6 +10672,8 @@ body.lite-mode *,body.lite-mode *::before,body.lite-mode *::after {
     const urls = [...new Set(machine.symbols.map(getIconUrl))];
     return Promise.all(urls.map(preloadSymbolImage));
   }
+  // The spin handler awaits this selected-machine-only preload; no full-library preload is done.
+  window.ksWarmMachineSymbolsById = machineId => warmMachineSymbols(MACHINES.find(item => item.id === machineId));
 
   /* Paytable uses the very same 3D symbol images as the actual reels. */
   function ensurePaytable() {
@@ -17872,5 +17967,291 @@ body.ks-mobile-more-open #ks-mobile-more-sheet{display:grid!important;}
 })();
 </script>
 
+
+<style id="kesug-win-island-v30">
+/* WIN ISLAND — small in-machine notification, not a modal or page overlay. */
+#win-popup { display:none !important; visibility:hidden !important; pointer-events:none !important; }
+#game-screen .ks-win-island {
+  position:relative;
+  z-index:4;
+  display:block;
+  width:100%;
+  min-width:0;
+  max-height:0;
+  margin:0;
+  overflow:hidden;
+  opacity:0;
+  transform:translate3d(0,-15px,0) scale(.985);
+  transform-origin:top center;
+  pointer-events:none;
+  transition:
+    max-height .42s cubic-bezier(.2,.78,.22,1),
+    margin-bottom .42s cubic-bezier(.2,.78,.22,1),
+    opacity .24s ease,
+    transform .42s cubic-bezier(.2,.78,.22,1);
+  contain:layout paint;
+}
+#game-screen .ks-win-island.is-visible {
+  max-height:116px;
+  margin-bottom:clamp(9px,1.5vh,15px);
+  opacity:1;
+  transform:translate3d(0,0,0) scale(1);
+}
+#game-screen .ks-win-island__clip { min-width:0; overflow:hidden; }
+#game-screen .ks-win-island__surface {
+  width:100%;
+  box-sizing:border-box;
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:3px;
+  padding:10px 15px 11px;
+  border:1px solid rgba(255,255,255,.27);
+  border-radius:23px;
+  color:#f7f7f8;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.24),rgba(118,120,126,.17) 48%,rgba(25,26,30,.57)),
+    rgba(42,43,48,.54);
+  -webkit-backdrop-filter:blur(28px) saturate(155%);
+  backdrop-filter:blur(28px) saturate(155%);
+  box-shadow:0 12px 34px rgba(0,0,0,.27),inset 0 1px 0 rgba(255,255,255,.25),inset 0 -1px 0 rgba(255,255,255,.07);
+}
+#game-screen .ks-win-island__topline {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-width:0;
+}
+#game-screen .ks-win-island__icon {
+  width:23px;height:23px;flex:0 0 23px;
+  display:grid;place-items:center;
+  border:1px solid rgba(255,255,255,.3);
+  border-radius:50%;
+  color:#fff;
+  background:linear-gradient(145deg,rgba(255,255,255,.36),rgba(255,255,255,.08));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 3px 9px rgba(0,0,0,.18);
+  font-size:12px;
+}
+#game-screen .ks-win-island__caption {
+  min-width:0;
+  color:rgba(255,255,255,.77);
+  font:800 9px/1.2 Manrope,Arial,sans-serif;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+#game-screen .ks-win-island__badge {
+  flex:0 0 auto;
+  margin-left:2px;
+  padding:4px 8px;
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:999px;
+  color:#fff;
+  background:rgba(255,255,255,.13);
+  font:900 8px/1 Manrope,Arial,sans-serif;
+  letter-spacing:.1em;
+}
+#game-screen .ks-win-island.is-mega .ks-win-island__badge {
+  color:#171719;
+  border-color:rgba(255,255,255,.5);
+  background:linear-gradient(135deg,#fff,#c9cbd0);
+}
+#game-screen .ks-win-island__amount {
+  display:flex;
+  justify-content:center;
+  align-items:baseline;
+  gap:3px;
+  min-width:0;
+  color:#fff;
+  font-family:'Space Grotesk',Manrope,Arial,sans-serif;
+  font-size:clamp(22px,4vw,31px);
+  font-weight:800;
+  line-height:1.05;
+  letter-spacing:-.045em;
+  font-variant-numeric:tabular-nums;
+  text-shadow:0 2px 12px rgba(255,255,255,.13);
+}
+#game-screen .ks-win-island__amount strong {
+  min-width:0;
+  max-width:100%;
+  overflow-wrap:anywhere;
+}
+#game-screen .ks-win-island__amount > span { color:rgba(255,255,255,.75); }
+#game-screen .ks-win-island__footer {
+  color:rgba(255,255,255,.62);
+  text-align:center;
+  font:800 8px/1.2 Manrope,Arial,sans-serif;
+  letter-spacing:.19em;
+}
+#game-screen .ks-win-island.is-visible .ks-win-island__icon { animation:ksWinIconIn .42s cubic-bezier(.2,.8,.2,1) both; }
+#game-screen .ks-win-island.is-visible .ks-win-island__amount { animation:ksWinAmountIn .48s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes ksWinIconIn { from{opacity:0;transform:scale(.72) rotate(-12deg)} to{opacity:1;transform:scale(1) rotate(0)} }
+@keyframes ksWinAmountIn { from{opacity:.4;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+/* Short landscape machines have a two-column layout; the island takes its own top row. */
+@media (max-height:560px) and (min-width:420px) {
+  #game-screen .slot-container.ks-has-win-island { grid-template-rows:auto auto minmax(0,1fr) !important; }
+  #game-screen .slot-container.ks-has-win-island .ks-win-island { grid-column:1/-1 !important;grid-row:1 !important; }
+  #game-screen .slot-container.ks-has-win-island .machine-balance-card { grid-column:1 !important;grid-row:2 !important; }
+  #game-screen .slot-container.ks-has-win-island .reels { grid-column:1 !important;grid-row:3 !important; }
+  #game-screen .slot-container.ks-has-win-island .game-controls { grid-column:2 !important;grid-row:2/span 2 !important; }
+}
+@media (prefers-reduced-motion:reduce) {
+  #game-screen .ks-win-island,#game-screen .ks-win-island * { transition:none !important;animation:none !important; }
+}
+</style>
+<script id="kesug-win-island-v30-runtime">
+(() => {
+  'use strict';
+  if (window.__KESUG_WIN_ISLAND_V30__) return;
+  window.__KESUG_WIN_ISLAND_V30__ = true;
+  let hideTimer = 0;
+  let countFrame = 0;
+  let showToken = 0;
+  const format = value => Math.max(0,Math.floor(value)).toLocaleString('ru-RU');
+
+  function hide() {
+    const island = document.getElementById('ks-win-island');
+    if (hideTimer) { clearTimeout(hideTimer); hideTimer = 0; }
+    if (countFrame) { cancelAnimationFrame(countFrame); countFrame = 0; }
+    showToken++;
+    if (island) {
+      island.classList.remove('is-visible','is-mega');
+      island.setAttribute('aria-hidden','true');
+    }
+    island?.closest('.slot-container')?.classList.remove('ks-has-win-island');
+  }
+
+  window.ksShowWinIsland = (amount,isMega,machine) => {
+    const win = Math.max(0,Math.floor(Number(amount)||0));
+    if (!win) return;
+    const island = document.getElementById('ks-win-island');
+    const amountNode = document.getElementById('ks-win-island-amount');
+    const badge = document.getElementById('ks-win-island-badge');
+    const caption = document.getElementById('ks-win-island-caption');
+    const footer = document.getElementById('ks-win-island-footer');
+    if (!island || !amountNode) return;
+
+    if (hideTimer) clearTimeout(hideTimer);
+    if (countFrame) cancelAnimationFrame(countFrame);
+    const token = ++showToken;
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || document.body.classList.contains('lite-mode');
+
+    island.classList.remove('is-visible');
+    island.classList.toggle('is-mega',Boolean(isMega));
+    island.setAttribute('aria-hidden','false');
+    island.closest('.slot-container')?.classList.add('ks-has-win-island');
+    if (badge) badge.textContent = isMega ? 'MEGA WIN' : 'WIN';
+    if (caption) caption.textContent = machine?.name ? `KESUG · ${machine.name}` : 'KESUG · РЕЗУЛЬТАТ';
+    if (footer) footer.textContent = 'ВИРТУАЛЬНЫХ ОЧКОВ';
+    amountNode.textContent = reduced ? format(win) : '0';
+
+    requestAnimationFrame(() => {
+      if (token !== showToken) return;
+      island.classList.add('is-visible');
+    });
+
+    if (!reduced) {
+      const duration = 680;
+      let start = 0;
+      const tick = now => {
+        if (token !== showToken) return;
+        if (!start) start = now;
+        const progress = Math.min(1,(now-start)/duration);
+        const eased = 1-Math.pow(1-progress,3);
+        amountNode.textContent = format(win*eased);
+        if (progress < 1) countFrame = requestAnimationFrame(tick);
+        else countFrame = 0;
+      };
+      countFrame = requestAnimationFrame(tick);
+    }
+
+    // Keep one island. A new win updates the same surface and restarts its hide timer.
+    hideTimer = window.setTimeout(() => {
+      if (token !== showToken) return;
+      island.classList.remove('is-visible','is-mega');
+      island.setAttribute('aria-hidden','true');
+      island.closest('.slot-container')?.classList.remove('ks-has-win-island');
+      hideTimer = 0;
+    },2900);
+  };
+  window.ksHideWinIsland = hide;
+
+  // Close the notice as soon as the player leaves the active machine.
+  const originalCloseMachine = window.closeMachine;
+  if (typeof originalCloseMachine === 'function' && !originalCloseMachine.__ksWinIslandWrapped) {
+    const wrappedCloseMachine = function(...args) {
+      hide();
+      return originalCloseMachine.apply(this,args);
+    };
+    wrappedCloseMachine.__ksWinIslandWrapped = true;
+    window.closeMachine = wrappedCloseMachine;
+  }
+})();
+</script>
+
+<script id="kesug-mobile-reel-image-gate-v30-1">
+(() => {
+  'use strict';
+  if (window.__KESUG_MOBILE_REEL_IMAGE_GATE_V301__) return;
+  window.__KESUG_MOBILE_REEL_IMAGE_GATE_V301__ = true;
+  const originalSpin = window.spin;
+  if (typeof originalSpin !== 'function') return;
+  let preparing = false;
+
+  window.spin = async function(...args) {
+    if (preparing) return;
+    const screen = document.getElementById('game-screen');
+    const machineId = screen?.dataset.machineId;
+    const button = document.getElementById('btn-spin');
+    if (!screen?.classList.contains('active') || !machineId || button?.disabled) {
+      return originalSpin.apply(this,args);
+    }
+
+    preparing = true;
+    const wasDisabled = Boolean(button?.disabled);
+    if (button) {
+      button.disabled = true;
+      button.dataset.ksPreloadingSymbols = '1';
+      button.setAttribute('aria-busy','true');
+    }
+
+    try {
+      if (typeof window.ksWarmMachineSymbolsById === 'function') {
+        await window.ksWarmMachineSymbolsById(machineId);
+      }
+    } catch (error) {
+      console.warn('Kesug: не удалось заранее подготовить все изображения барабанов',error);
+    } finally {
+      preparing = false;
+      if (button) {
+        button.disabled = wasDisabled;
+        delete button.dataset.ksPreloadingSymbols;
+        button.removeAttribute('aria-busy');
+      }
+    }
+
+    // The player may have closed or changed the machine while mobile images were loading.
+    if (!screen.classList.contains('active') || screen.dataset.machineId !== machineId) return;
+    return originalSpin.apply(this,args);
+  };
+})();
+</script>
+<style id="kesug-mobile-reel-image-gate-v30-1-style">
+#game-screen .reel-item img{display:block!important;visibility:visible!important;opacity:1!important;max-width:100%;max-height:100%;object-fit:contain;-webkit-transform:translateZ(0);transform:translateZ(0);}
+#game-screen #btn-spin[data-ks-preloading-symbols="1"]{cursor:progress!important;}
+@media(max-width:760px){#game-screen .reel-strip{transform:translate3d(0,0,0);backface-visibility:hidden;-webkit-backface-visibility:hidden;}#game-screen .reel-item img{width:78%!important;height:78%!important;contain:none!important;transform:none!important;-webkit-transform:none!important;backface-visibility:visible!important;-webkit-backface-visibility:visible!important;}}
+</style>
+
+
+<style id="kesug-reel-stability-v30-2">
+/* iOS/Android reel stability: the moving strip is the only transformed layer. */
+#game-screen .reel-window{overflow:hidden!important;contain:layout style!important;}
+#game-screen .reel-strip{display:flex!important;flex-direction:column!important;align-items:stretch!important;will-change:transform!important;backface-visibility:hidden!important;-webkit-backface-visibility:hidden!important;}
+#game-screen .reel-item{display:flex!important;flex:0 0 var(--reel-h)!important;align-items:center!important;justify-content:center!important;overflow:visible!important;}
+#game-screen .reel-item img{display:block!important;visibility:visible!important;opacity:1!important;contain:none!important;transform:none!important;-webkit-transform:none!important;backface-visibility:visible!important;-webkit-backface-visibility:visible!important;object-fit:contain!important;}
+@media(max-width:760px){#game-screen .reel-window{transform:none!important;}#game-screen .reel-strip{transform-style:flat!important;}#game-screen .reel-item img{filter:none!important;}}
+</style>
 </body>
 </html>
