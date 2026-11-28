@@ -143,7 +143,7 @@ button:disabled{opacity:.42;cursor:not-allowed}
     <div class="auth-chip"><i></i><span id="authStepLabel">ПОДКЛЮЧЕНИЕ АККАУНТА</span></div>
     <h1 class="auth-title" id="authTitle">Подключи Telegram</h1>
     <p class="auth-lead" id="authLead">Войди через свой Telegram-аккаунт. Код подтверждения придёт в Telegram или по SMS — в зависимости от способа, выбранного Telegram.</p>
-    <form class="auth-form" id="authForm">
+    <form class="auth-form" id="authForm" novalidate>
       <div id="authCredentials">
         <div class="auth-field"><label for="authApiId">API ID</label><input class="auth-input" id="authApiId" value="17349" readonly autocomplete="off"></div>
         <div class="auth-field" style="margin-top:13px"><label for="authApiHash">API HASH</label><input class="auth-input" id="authApiHash" type="password" placeholder="Вставь свой API hash" autocomplete="off" spellcheck="false" required></div>
@@ -403,6 +403,31 @@ restore();applySettings();if(!settings.motion)document.documentElement.classList
 })();
 </script>
 
+<script>
+// Visible fallback for browsers where the module script is blocked or fails to start.
+(() => {
+  const form = document.getElementById('authForm');
+  const button = document.getElementById('authSubmit');
+  const status = document.getElementById('authStatus');
+  if (form) form.noValidate = true;
+  if (form) form.addEventListener('submit', (event) => {
+    if (!window.KESUGGRAM_AUTH_READY) {
+      event.preventDefault();
+      if (status) {
+        status.className = 'auth-status error';
+        status.textContent = 'Модуль авторизации не запустился. Обнови страницу по HTTPS; если ошибка останется, проверь блокировку модулей/CDN в браузере.';
+      }
+    }
+  }, true);
+  if (button) button.addEventListener('click', () => {
+    if (!window.KESUGGRAM_AUTH_READY && status) {
+      status.className = 'auth-status error';
+      status.textContent = 'Подключение ещё не инициализировано. Разреши загрузку JavaScript-модулей и обнови страницу.';
+    }
+  });
+})();
+</script>
+
 <script type="module">
 const API_ID = 17349;
 const SESSION_KEY = 'kesuggram:telegram-session:v1';
@@ -448,6 +473,7 @@ function explainGramError(error) {
     return seconds ? `Telegram просит подождать ${seconds} сек. Не отправляй новые запросы.` : 'Telegram временно ограничил запросы. Подожди и попробуй позже.';
   }
   if (code.includes('AUTH_KEY_UNREGISTERED')) return 'Сохранённая сессия больше не действует. Войди по номеру ещё раз.';
+  if (code.includes('FAILED TO FETCH DYNAMICALLY IMPORTED MODULE') || code.includes('IMPORTING A MODULE SCRIPT FAILED') || code.includes('ERR_NAME_NOT_RESOLVED') || code.includes('ERR_CONNECTION') || code.includes('FETCH FAILED')) return 'Не загрузилась библиотека GramJS с esm.sh. Проверь доступ к esm.sh, отключи блокировщик для сайта или открой KesugGram через GitHub Pages по HTTPS.';
   if (code.includes('NETWORK') || code.includes('WEBSOCKET') || code.includes('CONNECTION')) return 'Не удалось подключиться к Telegram по WebSocket. Проверь интернет/VPN и попробуй позже.';
   return String(error?.message || error || 'Неизвестная ошибка Telegram').replace(/^Error:\s*/,'').slice(0,240);
 }
@@ -511,6 +537,7 @@ function resetAuthForm(message='') {
 
 async function authSubmit(event) {
   event.preventDefault();
+  setStatus('Проверяю данные…');
   if (authPhase !== 'credentials') {
     const value = challengeInput.value.trim();
     if (!value) { setStatus('Заполни поле, чтобы продолжить.', 'error'); return; }
@@ -529,7 +556,12 @@ async function authSubmit(event) {
     return;
   }
   if (!phone && !localStorage.getItem(SESSION_KEY)) {
-    setStatus('Введи номер телефона в международном формате.', 'error');
+    setStatus('Поле номера пустое. Введи номер в международном формате, например +7 900 000-00-00.', 'error');
+    $('#authPhone').focus();
+    return;
+  }
+  if (phone && !/^\+?[0-9]{7,15}$/.test(phone)) {
+    setStatus('Проверь номер: используй международный формат с кодом страны, например +7 900 000-00-00.', 'error');
     $('#authPhone').focus();
     return;
   }
@@ -552,7 +584,6 @@ async function authSubmit(event) {
       ...(PromisedWebSockets ? { networkSocket: PromisedWebSockets } : {})
     };
     telegramClient = new TelegramClient(session, API_ID, apiHashMemory, options);
-    $('#authApiHash').value = '';
     setStatus(savedSession ? 'Проверяю сохранённую Telegram-сессию…' : 'Подключаюсь к Telegram…');
     setBusy(true, 'Подключаюсь…');
 
@@ -582,6 +613,7 @@ async function authSubmit(event) {
     else localStorage.removeItem(SESSION_KEY);
 
     window.KesugGramBridge?.setAccount(me);
+    $('#authApiHash').value = '';
     hideGate();
     setStatus('Аккаунт подключён.', 'success');
     try { await loadTelegramDialogs(); } catch (loadError) { window.KesugGramBridge?.toast(`Вход выполнен, но диалоги не загрузились: ${explainGramError(loadError)}`); }
@@ -761,6 +793,7 @@ $('#messages').addEventListener('scroll', () => {
 }, { passive:true });
 
 $('#authForm').addEventListener('submit', authSubmit);
+window.KESUGGRAM_AUTH_READY = true;
 $('#authCancel').addEventListener('click', () => {
   cancelRequested = true;
   if (authResolver) { const pending = authResolver; authResolver = null; pending.reject(new Error('AUTH_USER_CANCEL')); }
