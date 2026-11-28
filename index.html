@@ -135,13 +135,15 @@ button:disabled{opacity:.42;cursor:not-allowed}
 @media(max-width:520px){.auth-gate{padding:14px}.auth-card{padding:23px;border-radius:25px}.auth-title{font-size:26px}}
 
 </style>
-<script type="importmap">
-{
-  "imports": {
-    "crypto": "data:text/javascript;charset=utf-8;base64,bGV0IGhhc2hNb2R1bGUgPSBudWxsOwpsZXQgaGFzaE1vZHVsZUxvYWRFcnJvciA9IG51bGw7CmZvciAoY29uc3QgaGFzaE1vZHVsZVVybCBvZiBbCiAgImh0dHBzOi8vZXNtLnVucGtnLmNvbS9oYXNoLmpzQDEuMS43P3RhcmdldD1lc25leHQiLAogICJodHRwczovL2Nkbi5qc2RlbGl2ci5uZXQvbnBtL2hhc2guanNAMS4xLjcvK2VzbSIKXSkgewogIHRyeSB7CiAgICBoYXNoTW9kdWxlID0gYXdhaXQgaW1wb3J0KGhhc2hNb2R1bGVVcmwpOwogICAgYnJlYWs7CiAgfSBjYXRjaCAoZXJyb3IpIHsKICAgIGhhc2hNb2R1bGVMb2FkRXJyb3IgPSBlcnJvcjsKICB9Cn0KaWYgKCFoYXNoTW9kdWxlKSB7CiAgdGhyb3cgbmV3IEVycm9yKCLQndC1INGD0LTQsNC70L7RgdGMINC30LDQs9GA0YPQt9C40YLRjCBoYXNoLmpzINGBIFVOUEtHIEVTTSDQuNC70LgganNEZWxpdnI6ICIgKyAoaGFzaE1vZHVsZUxvYWRFcnJvcj8ubWVzc2FnZSB8fCBoYXNoTW9kdWxlTG9hZEVycm9yKSk7Cn0KY29uc3QgaGFzaGxpYiA9IGhhc2hNb2R1bGUuZGVmYXVsdCB8fCBoYXNoTW9kdWxlOwpjb25zdCBCdWZmZXJDdG9yID0gKCkgPT4gZ2xvYmFsVGhpcy5CdWZmZXI7CmNvbnN0IGFsZ29yaXRobXMgPSB7CiAgc2hhMTogaGFzaGxpYi5zaGExLAogIHNoYTIyNDogaGFzaGxpYi5zaGEyMjQsCiAgc2hhMjU2OiBoYXNobGliLnNoYTI1NiwKICBzaGEzODQ6IGhhc2hsaWIuc2hhMzg0LAogIHNoYTUxMjogaGFzaGxpYi5zaGE1MTIKfTsKZnVuY3Rpb24gbm9ybWFsaXplQWxnb3JpdGhtKG5hbWUpIHsKICBjb25zdCBrZXkgPSBTdHJpbmcobmFtZSB8fCAiIikudG9Mb3dlckNhc2UoKS5yZXBsYWNlKC9bLV9dL2csICIiKTsKICBjb25zdCBjdG9yID0gYWxnb3JpdGhtc1trZXldOwogIGlmICh0eXBlb2YgY3RvciAhPT0gImZ1bmN0aW9uIikgdGhyb3cgbmV3IEVycm9yKGBVbnN1cHBvcnRlZCBoYXNoIGFsZ29yaXRobTogJHtuYW1lfWApOwogIHJldHVybiBjdG9yOwp9CmZ1bmN0aW9uIGJ5dGVzRnJvbShkYXRhLCBlbmNvZGluZykgewogIGlmICh0eXBlb2YgZGF0YSA9PT0gInN0cmluZyIpIHsKICAgIGNvbnN0IGVuYyA9IFN0cmluZyhlbmNvZGluZyB8fCAidXRmOCIpLnRvTG93ZXJDYXNlKCk7CiAgICBpZiAoZW5jID09PSAiaGV4IikgewogICAgICBjb25zdCBjbGVhbiA9IGRhdGEucmVwbGFjZSgvW14wLTlhLWZdL2dpLCAiIik7CiAgICAgIGNvbnN0IGV2ZW4gPSBjbGVhbi5sZW5ndGggJSAyID8gIjAiICsgY2xlYW4gOiBjbGVhbjsKICAgICAgY29uc3Qgb3V0ID0gW107CiAgICAgIGZvciAobGV0IGkgPSAwOyBpIDwgZXZlbi5sZW5ndGg7IGkgKz0gMikgb3V0LnB1c2gocGFyc2VJbnQoZXZlbi5zbGljZShpLCBpICsgMiksIDE2KSk7CiAgICAgIHJldHVybiBvdXQ7CiAgICB9CiAgICBpZiAoZW5jID09PSAiYmFzZTY0IiB8fCBlbmMgPT09ICJiYXNlNjR1cmwiKSB7CiAgICAgIGNvbnN0IG5vcm1hbGl6ZWQgPSBlbmMgPT09ICJiYXNlNjR1cmwiID8gZGF0YS5yZXBsYWNlKC8tL2csICIrIikucmVwbGFjZSgvXy9nLCAiLyIpIDogZGF0YTsKICAgICAgY29uc3QgcmF3ID0gYXRvYihub3JtYWxpemVkLnBhZEVuZChNYXRoLmNlaWwobm9ybWFsaXplZC5sZW5ndGggLyA0KSAqIDQsICI9IikpOwogICAgICByZXR1cm4gQXJyYXkuZnJvbShyYXcsIGNoID0+IGNoLmNoYXJDb2RlQXQoMCkpOwogICAgfQogICAgaWYgKGVuYyA9PT0gImxhdGluMSIgfHwgZW5jID09PSAiYmluYXJ5IikgcmV0dXJuIEFycmF5LmZyb20oZGF0YSwgY2ggPT4gY2guY2hhckNvZGVBdCgwKSAmIDI1NSk7CiAgICBpZiAoZW5jID09PSAiYXNjaWkiKSByZXR1cm4gQXJyYXkuZnJvbShkYXRhLCBjaCA9PiBjaC5jaGFyQ29kZUF0KDApICYgMTI3KTsKICAgIHJldHVybiBBcnJheS5mcm9tKG5ldyBUZXh0RW5jb2RlcigpLmVuY29kZShkYXRhKSk7CiAgfQogIGlmIChkYXRhID09IG51bGwpIHJldHVybiBbXTsKICBpZiAoQXJyYXkuaXNBcnJheShkYXRhKSkgcmV0dXJuIGRhdGEuc2xpY2UoKTsKICBpZiAoZGF0YSBpbnN0YW5jZW9mIEFycmF5QnVmZmVyKSByZXR1cm4gQXJyYXkuZnJvbShuZXcgVWludDhBcnJheShkYXRhKSk7CiAgaWYgKEFycmF5QnVmZmVyLmlzVmlldyhkYXRhKSkgcmV0dXJuIEFycmF5LmZyb20obmV3IFVpbnQ4QXJyYXkoZGF0YS5idWZmZXIsIGRhdGEuYnl0ZU9mZnNldCwgZGF0YS5ieXRlTGVuZ3RoKSk7CiAgaWYgKHR5cGVvZiBkYXRhLmxlbmd0aCA9PT0gIm51bWJlciIpIHJldHVybiBBcnJheS5mcm9tKGRhdGEpOwogIHRocm93IG5ldyBUeXBlRXJyb3IoIkhhc2ggaW5wdXQgbXVzdCBiZSBhIHN0cmluZywgQnVmZmVyLCB0eXBlZCBhcnJheSwgb3IgQXJyYXlCdWZmZXIiKTsKfQpmdW5jdGlvbiBvdXRwdXRCeXRlcyhieXRlcywgZW5jb2RpbmcpIHsKICBjb25zdCBvdXQgPSBVaW50OEFycmF5LmZyb20oYnl0ZXMsIHZhbHVlID0+IHZhbHVlICYgMjU1KTsKICBpZiAoIWVuY29kaW5nKSB7CiAgICBjb25zdCBCID0gQnVmZmVyQ3RvcigpOwogICAgcmV0dXJuIHR5cGVvZiBCPy5mcm9tID09PSAiZnVuY3Rpb24iID8gQi5mcm9tKG91dCkgOiBvdXQ7CiAgfQogIGNvbnN0IGVuYyA9IFN0cmluZyhlbmNvZGluZykudG9Mb3dlckNhc2UoKTsKICBjb25zdCBCID0gQnVmZmVyQ3RvcigpOwogIGlmICh0eXBlb2YgQj8uZnJvbSA9PT0gImZ1bmN0aW9uIikgewogICAgY29uc3QgYnVmZmVyID0gQi5mcm9tKG91dCk7CiAgICBpZiAoZW5jID09PSAiYmFzZTY0dXJsIikgcmV0dXJuIGJ1ZmZlci50b1N0cmluZygiYmFzZTY0IikucmVwbGFjZSgvPS9nLCAiIikucmVwbGFjZSgvXCsvZywgIi0iKS5yZXBsYWNlKC9cLy9nLCAiXyIpOwogICAgcmV0dXJuIGJ1ZmZlci50b1N0cmluZyhlbmMpOwogIH0KICBpZiAoZW5jID09PSAiaGV4IikgcmV0dXJuIEFycmF5LmZyb20ob3V0LCBiID0+IGIudG9TdHJpbmcoMTYpLnBhZFN0YXJ0KDIsICIwIikpLmpvaW4oIiIpOwogIGlmIChlbmMgPT09ICJiYXNlNjQiIHx8IGVuYyA9PT0gImJhc2U2NHVybCIpIHsKICAgIGxldCBiaW5hcnkgPSAiIjsKICAgIGZvciAoY29uc3QgYiBvZiBvdXQpIGJpbmFyeSArPSBTdHJpbmcuZnJvbUNoYXJDb2RlKGIpOwogICAgY29uc3QgYmFzZTY0ID0gYnRvYShiaW5hcnkpOwogICAgcmV0dXJuIGVuYyA9PT0gImJhc2U2NHVybCIgPyBiYXNlNjQucmVwbGFjZSgvPS9nLCAiIikucmVwbGFjZSgvXCsvZywgIi0iKS5yZXBsYWNlKC9cLy9nLCAiXyIpIDogYmFzZTY0OwogIH0KICBpZiAoZW5jID09PSAidXRmOCIgfHwgZW5jID09PSAidXRmLTgiKSByZXR1cm4gbmV3IFRleHREZWNvZGVyKCkuZGVjb2RlKG91dCk7CiAgcmV0dXJuIEFycmF5LmZyb20ob3V0LCBiID0+IFN0cmluZy5mcm9tQ2hhckNvZGUoYikpLmpvaW4oIiIpOwp9CmZ1bmN0aW9uIHdyYXBEaWdlc3QoZW5naW5lKSB7CiAgbGV0IGZpbmFsaXplZCA9IGZhbHNlOwogIGNvbnN0IGFwaSA9IHsKICAgIHVwZGF0ZShkYXRhLCBpbnB1dEVuY29kaW5nKSB7CiAgICAgIGlmIChmaW5hbGl6ZWQpIHRocm93IG5ldyBFcnJvcigiRGlnZXN0IGFscmVhZHkgZmluYWxpemVkIik7CiAgICAgIGVuZ2luZS51cGRhdGUoYnl0ZXNGcm9tKGRhdGEsIGlucHV0RW5jb2RpbmcpKTsKICAgICAgcmV0dXJuIGFwaTsKICAgIH0sCiAgICBkaWdlc3QoZW5jb2RpbmcpIHsKICAgICAgaWYgKGZpbmFsaXplZCkgdGhyb3cgbmV3IEVycm9yKCJEaWdlc3QgYWxyZWFkeSBmaW5hbGl6ZWQiKTsKICAgICAgZmluYWxpemVkID0gdHJ1ZTsKICAgICAgcmV0dXJuIG91dHB1dEJ5dGVzKGVuZ2luZS5kaWdlc3QoKSwgZW5jb2RpbmcpOwogICAgfQogIH07CiAgcmV0dXJuIGFwaTsKfQpleHBvcnQgZnVuY3Rpb24gY3JlYXRlSGFzaChhbGdvcml0aG0pIHsKICBjb25zdCBIYXNoID0gbm9ybWFsaXplQWxnb3JpdGhtKGFsZ29yaXRobSk7CiAgcmV0dXJuIHdyYXBEaWdlc3QoSGFzaCgpKTsKfQpleHBvcnQgZnVuY3Rpb24gY3JlYXRlSG1hYyhhbGdvcml0aG0sIGtleSkgewogIGNvbnN0IEhhc2ggPSBub3JtYWxpemVBbGdvcml0aG0oYWxnb3JpdGhtKTsKICBpZiAodHlwZW9mIGhhc2hsaWIuaG1hYyAhPT0gImZ1bmN0aW9uIikgdGhyb3cgbmV3IEVycm9yKCJoYXNoLmpzIEhNQUMgaXMgdW5hdmFpbGFibGUiKTsKICByZXR1cm4gd3JhcERpZ2VzdChoYXNobGliLmhtYWMoSGFzaCwgYnl0ZXNGcm9tKGtleSkpKTsKfQpleHBvcnQgZnVuY3Rpb24gcmFuZG9tQnl0ZXMoc2l6ZSwgY2FsbGJhY2spIHsKICBjb25zdCBsZW5ndGggPSBOdW1iZXIoc2l6ZSk7CiAgaWYgKCFOdW1iZXIuaXNTYWZlSW50ZWdlcihsZW5ndGgpIHx8IGxlbmd0aCA8IDApIHRocm93IG5ldyBSYW5nZUVycm9yKCJJbnZhbGlkIHJhbmRvbUJ5dGVzIHNpemUiKTsKICBjb25zdCBuYXRpdmVDcnlwdG8gPSBnbG9iYWxUaGlzLmNyeXB0bzsKICBpZiAoIW5hdGl2ZUNyeXB0bz8uZ2V0UmFuZG9tVmFsdWVzKSB0aHJvdyBuZXcgRXJyb3IoIlNlY3VyZSBicm93c2VyIHJhbmRvbSBnZW5lcmF0b3IgaXMgdW5hdmFpbGFibGU7IHVzZSBIVFRQUyIpOwogIGNvbnN0IGJ5dGVzID0gbmV3IFVpbnQ4QXJyYXkobGVuZ3RoKTsKICAvLyBXZWIgQ3J5cHRvIGxpbWl0cyBlYWNoIGdldFJhbmRvbVZhbHVlcyBjYWxsIHRvIDY1LDUzNiBieXRlcy4KICBmb3IgKGxldCBvZmZzZXQgPSAwOyBvZmZzZXQgPCBsZW5ndGg7IG9mZnNldCArPSA2NTUzNikgewogICAgbmF0aXZlQ3J5cHRvLmdldFJhbmRvbVZhbHVlcyhieXRlcy5zdWJhcnJheShvZmZzZXQsIE1hdGgubWluKG9mZnNldCArIDY1NTM2LCBsZW5ndGgpKSk7CiAgfQogIGNvbnN0IEIgPSBCdWZmZXJDdG9yKCk7CiAgY29uc3QgcmVzdWx0ID0gdHlwZW9mIEI/LmZyb20gPT09ICJmdW5jdGlvbiIgPyBCLmZyb20oYnl0ZXMpIDogYnl0ZXM7CiAgaWYgKHR5cGVvZiBjYWxsYmFjayA9PT0gImZ1bmN0aW9uIikgewogICAgcXVldWVNaWNyb3Rhc2soKCkgPT4gY2FsbGJhY2sobnVsbCwgcmVzdWx0KSk7CiAgICByZXR1cm4gdW5kZWZpbmVkOwogIH0KICByZXR1cm4gcmVzdWx0Owp9CmV4cG9ydCBmdW5jdGlvbiByYW5kb21GaWxsU3luYyh0YXJnZXQsIG9mZnNldCA9IDAsIHNpemUpIHsKICBpZiAoIUFycmF5QnVmZmVyLmlzVmlldyh0YXJnZXQpKSB0aHJvdyBuZXcgVHlwZUVycm9yKCJyYW5kb21GaWxsU3luYyB0YXJnZXQgbXVzdCBiZSBhIHR5cGVkIGFycmF5IG9yIEJ1ZmZlciIpOwogIGNvbnN0IHZpZXcgPSBuZXcgVWludDhBcnJheSh0YXJnZXQuYnVmZmVyLCB0YXJnZXQuYnl0ZU9mZnNldCwgdGFyZ2V0LmJ5dGVMZW5ndGgpOwogIGNvbnN0IHN0YXJ0ID0gTnVtYmVyKG9mZnNldCkgfHwgMDsKICBjb25zdCBsZW5ndGggPSBzaXplID09IG51bGwgPyB2aWV3Lmxlbmd0aCAtIHN0YXJ0IDogTnVtYmVyKHNpemUpOwogIGlmIChzdGFydCA8IDAgfHwgbGVuZ3RoIDwgMCB8fCBzdGFydCArIGxlbmd0aCA+IHZpZXcubGVuZ3RoKSB0aHJvdyBuZXcgUmFuZ2VFcnJvcigicmFuZG9tRmlsbFN5bmMgcmFuZ2UgaXMgb3V0IG9mIGJvdW5kcyIpOwogIGNvbnN0IG5hdGl2ZUNyeXB0byA9IGdsb2JhbFRoaXMuY3J5cHRvOwogIGlmICghbmF0aXZlQ3J5cHRvPy5nZXRSYW5kb21WYWx1ZXMpIHRocm93IG5ldyBFcnJvcigiU2VjdXJlIGJyb3dzZXIgcmFuZG9tIGdlbmVyYXRvciBpcyB1bmF2YWlsYWJsZTsgdXNlIEhUVFBTIik7CiAgZm9yIChsZXQgcG9zID0gc3RhcnQ7IHBvcyA8IHN0YXJ0ICsgbGVuZ3RoOyBwb3MgKz0gNjU1MzYpIHsKICAgIG5hdGl2ZUNyeXB0by5nZXRSYW5kb21WYWx1ZXModmlldy5zdWJhcnJheShwb3MsIE1hdGgubWluKHBvcyArIDY1NTM2LCBzdGFydCArIGxlbmd0aCkpKTsKICB9CiAgcmV0dXJuIHRhcmdldDsKfQpleHBvcnQgZnVuY3Rpb24gcmFuZG9tRmlsbCh0YXJnZXQsIG9mZnNldCwgc2l6ZSwgY2FsbGJhY2spIHsKICBpZiAodHlwZW9mIG9mZnNldCA9PT0gImZ1bmN0aW9uIikgeyBjYWxsYmFjayA9IG9mZnNldDsgb2Zmc2V0ID0gMDsgc2l6ZSA9IHVuZGVmaW5lZDsgfQogIGVsc2UgaWYgKHR5cGVvZiBzaXplID09PSAiZnVuY3Rpb24iKSB7IGNhbGxiYWNrID0gc2l6ZTsgc2l6ZSA9IHVuZGVmaW5lZDsgfQogIHRyeSB7CiAgICBjb25zdCByZXN1bHQgPSByYW5kb21GaWxsU3luYyh0YXJnZXQsIG9mZnNldCB8fCAwLCBzaXplKTsKICAgIGlmICh0eXBlb2YgY2FsbGJhY2sgPT09ICJmdW5jdGlvbiIpIHF1ZXVlTWljcm90YXNrKCgpID0+IGNhbGxiYWNrKG51bGwsIHJlc3VsdCkpOwogICAgcmV0dXJuIHR5cGVvZiBjYWxsYmFjayA9PT0gImZ1bmN0aW9uIiA/IHVuZGVmaW5lZCA6IHJlc3VsdDsKICB9IGNhdGNoIChlcnJvcikgewogICAgaWYgKHR5cGVvZiBjYWxsYmFjayA9PT0gImZ1bmN0aW9uIikgeyBxdWV1ZU1pY3JvdGFzaygoKSA9PiBjYWxsYmFjayhlcnJvcikpOyByZXR1cm4gdW5kZWZpbmVkOyB9CiAgICB0aHJvdyBlcnJvcjsKICB9Cn0KZXhwb3J0IGNvbnN0IHdlYmNyeXB0byA9IGdsb2JhbFRoaXMuY3J5cHRvOwpleHBvcnQgY29uc3QgZ2V0UmFuZG9tVmFsdWVzID0gKHZhbHVlKSA9PiBnbG9iYWxUaGlzLmNyeXB0by5nZXRSYW5kb21WYWx1ZXModmFsdWUpOwpleHBvcnQgY29uc3QgdGltaW5nU2FmZUVxdWFsID0gKGEsIGIpID0+IHsKICBjb25zdCBsZWZ0ID0gYnl0ZXNGcm9tKGEpLCByaWdodCA9IGJ5dGVzRnJvbShiKTsKICBpZiAobGVmdC5sZW5ndGggIT09IHJpZ2h0Lmxlbmd0aCkgdGhyb3cgbmV3IEVycm9yKCJJbnB1dCBidWZmZXJzIG11c3QgaGF2ZSB0aGUgc2FtZSBieXRlIGxlbmd0aCIpOwogIGxldCBkaWZmID0gMDsKICBmb3IgKGxldCBpID0gMDsgaSA8IGxlZnQubGVuZ3RoOyBpKyspIGRpZmYgfD0gbGVmdFtpXSBeIHJpZ2h0W2ldOwogIHJldHVybiBkaWZmID09PSAwOwp9OwpleHBvcnQgY29uc3QgZ2V0SGFzaGVzID0gKCkgPT4gT2JqZWN0LmtleXMoYWxnb3JpdGhtcyk7CmV4cG9ydCBkZWZhdWx0IHsgY3JlYXRlSGFzaCwgY3JlYXRlSG1hYywgcmFuZG9tQnl0ZXMsIHJhbmRvbUZpbGxTeW5jLCByYW5kb21GaWxsLCB3ZWJjcnlwdG8sIGdldFJhbmRvbVZhbHVlcywgdGltaW5nU2FmZUVxdWFsLCBnZXRIYXNoZXMgfTsK",
-    "node:crypto": "data:text/javascript;charset=utf-8;base64,bGV0IGhhc2hNb2R1bGUgPSBudWxsOwpsZXQgaGFzaE1vZHVsZUxvYWRFcnJvciA9IG51bGw7CmZvciAoY29uc3QgaGFzaE1vZHVsZVVybCBvZiBbCiAgImh0dHBzOi8vZXNtLnVucGtnLmNvbS9oYXNoLmpzQDEuMS43P3RhcmdldD1lc25leHQiLAogICJodHRwczovL2Nkbi5qc2RlbGl2ci5uZXQvbnBtL2hhc2guanNAMS4xLjcvK2VzbSIKXSkgewogIHRyeSB7CiAgICBoYXNoTW9kdWxlID0gYXdhaXQgaW1wb3J0KGhhc2hNb2R1bGVVcmwpOwogICAgYnJlYWs7CiAgfSBjYXRjaCAoZXJyb3IpIHsKICAgIGhhc2hNb2R1bGVMb2FkRXJyb3IgPSBlcnJvcjsKICB9Cn0KaWYgKCFoYXNoTW9kdWxlKSB7CiAgdGhyb3cgbmV3IEVycm9yKCLQndC1INGD0LTQsNC70L7RgdGMINC30LDQs9GA0YPQt9C40YLRjCBoYXNoLmpzINGBIFVOUEtHIEVTTSDQuNC70LgganNEZWxpdnI6ICIgKyAoaGFzaE1vZHVsZUxvYWRFcnJvcj8ubWVzc2FnZSB8fCBoYXNoTW9kdWxlTG9hZEVycm9yKSk7Cn0KY29uc3QgaGFzaGxpYiA9IGhhc2hNb2R1bGUuZGVmYXVsdCB8fCBoYXNoTW9kdWxlOwpjb25zdCBCdWZmZXJDdG9yID0gKCkgPT4gZ2xvYmFsVGhpcy5CdWZmZXI7CmNvbnN0IGFsZ29yaXRobXMgPSB7CiAgc2hhMTogaGFzaGxpYi5zaGExLAogIHNoYTIyNDogaGFzaGxpYi5zaGEyMjQsCiAgc2hhMjU2OiBoYXNobGliLnNoYTI1NiwKICBzaGEzODQ6IGhhc2hsaWIuc2hhMzg0LAogIHNoYTUxMjogaGFzaGxpYi5zaGE1MTIKfTsKZnVuY3Rpb24gbm9ybWFsaXplQWxnb3JpdGhtKG5hbWUpIHsKICBjb25zdCBrZXkgPSBTdHJpbmcobmFtZSB8fCAiIikudG9Mb3dlckNhc2UoKS5yZXBsYWNlKC9bLV9dL2csICIiKTsKICBjb25zdCBjdG9yID0gYWxnb3JpdGhtc1trZXldOwogIGlmICh0eXBlb2YgY3RvciAhPT0gImZ1bmN0aW9uIikgdGhyb3cgbmV3IEVycm9yKGBVbnN1cHBvcnRlZCBoYXNoIGFsZ29yaXRobTogJHtuYW1lfWApOwogIHJldHVybiBjdG9yOwp9CmZ1bmN0aW9uIGJ5dGVzRnJvbShkYXRhLCBlbmNvZGluZykgewogIGlmICh0eXBlb2YgZGF0YSA9PT0gInN0cmluZyIpIHsKICAgIGNvbnN0IGVuYyA9IFN0cmluZyhlbmNvZGluZyB8fCAidXRmOCIpLnRvTG93ZXJDYXNlKCk7CiAgICBpZiAoZW5jID09PSAiaGV4IikgewogICAgICBjb25zdCBjbGVhbiA9IGRhdGEucmVwbGFjZSgvW14wLTlhLWZdL2dpLCAiIik7CiAgICAgIGNvbnN0IGV2ZW4gPSBjbGVhbi5sZW5ndGggJSAyID8gIjAiICsgY2xlYW4gOiBjbGVhbjsKICAgICAgY29uc3Qgb3V0ID0gW107CiAgICAgIGZvciAobGV0IGkgPSAwOyBpIDwgZXZlbi5sZW5ndGg7IGkgKz0gMikgb3V0LnB1c2gocGFyc2VJbnQoZXZlbi5zbGljZShpLCBpICsgMiksIDE2KSk7CiAgICAgIHJldHVybiBvdXQ7CiAgICB9CiAgICBpZiAoZW5jID09PSAiYmFzZTY0IiB8fCBlbmMgPT09ICJiYXNlNjR1cmwiKSB7CiAgICAgIGNvbnN0IG5vcm1hbGl6ZWQgPSBlbmMgPT09ICJiYXNlNjR1cmwiID8gZGF0YS5yZXBsYWNlKC8tL2csICIrIikucmVwbGFjZSgvXy9nLCAiLyIpIDogZGF0YTsKICAgICAgY29uc3QgcmF3ID0gYXRvYihub3JtYWxpemVkLnBhZEVuZChNYXRoLmNlaWwobm9ybWFsaXplZC5sZW5ndGggLyA0KSAqIDQsICI9IikpOwogICAgICByZXR1cm4gQXJyYXkuZnJvbShyYXcsIGNoID0+IGNoLmNoYXJDb2RlQXQoMCkpOwogICAgfQogICAgaWYgKGVuYyA9PT0gImxhdGluMSIgfHwgZW5jID09PSAiYmluYXJ5IikgcmV0dXJuIEFycmF5LmZyb20oZGF0YSwgY2ggPT4gY2guY2hhckNvZGVBdCgwKSAmIDI1NSk7CiAgICBpZiAoZW5jID09PSAiYXNjaWkiKSByZXR1cm4gQXJyYXkuZnJvbShkYXRhLCBjaCA9PiBjaC5jaGFyQ29kZUF0KDApICYgMTI3KTsKICAgIHJldHVybiBBcnJheS5mcm9tKG5ldyBUZXh0RW5jb2RlcigpLmVuY29kZShkYXRhKSk7CiAgfQogIGlmIChkYXRhID09IG51bGwpIHJldHVybiBbXTsKICBpZiAoQXJyYXkuaXNBcnJheShkYXRhKSkgcmV0dXJuIGRhdGEuc2xpY2UoKTsKICBpZiAoZGF0YSBpbnN0YW5jZW9mIEFycmF5QnVmZmVyKSByZXR1cm4gQXJyYXkuZnJvbShuZXcgVWludDhBcnJheShkYXRhKSk7CiAgaWYgKEFycmF5QnVmZmVyLmlzVmlldyhkYXRhKSkgcmV0dXJuIEFycmF5LmZyb20obmV3IFVpbnQ4QXJyYXkoZGF0YS5idWZmZXIsIGRhdGEuYnl0ZU9mZnNldCwgZGF0YS5ieXRlTGVuZ3RoKSk7CiAgaWYgKHR5cGVvZiBkYXRhLmxlbmd0aCA9PT0gIm51bWJlciIpIHJldHVybiBBcnJheS5mcm9tKGRhdGEpOwogIHRocm93IG5ldyBUeXBlRXJyb3IoIkhhc2ggaW5wdXQgbXVzdCBiZSBhIHN0cmluZywgQnVmZmVyLCB0eXBlZCBhcnJheSwgb3IgQXJyYXlCdWZmZXIiKTsKfQpmdW5jdGlvbiBvdXRwdXRCeXRlcyhieXRlcywgZW5jb2RpbmcpIHsKICBjb25zdCBvdXQgPSBVaW50OEFycmF5LmZyb20oYnl0ZXMsIHZhbHVlID0+IHZhbHVlICYgMjU1KTsKICBpZiAoIWVuY29kaW5nKSB7CiAgICBjb25zdCBCID0gQnVmZmVyQ3RvcigpOwogICAgcmV0dXJuIHR5cGVvZiBCPy5mcm9tID09PSAiZnVuY3Rpb24iID8gQi5mcm9tKG91dCkgOiBvdXQ7CiAgfQogIGNvbnN0IGVuYyA9IFN0cmluZyhlbmNvZGluZykudG9Mb3dlckNhc2UoKTsKICBjb25zdCBCID0gQnVmZmVyQ3RvcigpOwogIGlmICh0eXBlb2YgQj8uZnJvbSA9PT0gImZ1bmN0aW9uIikgewogICAgY29uc3QgYnVmZmVyID0gQi5mcm9tKG91dCk7CiAgICBpZiAoZW5jID09PSAiYmFzZTY0dXJsIikgcmV0dXJuIGJ1ZmZlci50b1N0cmluZygiYmFzZTY0IikucmVwbGFjZSgvPS9nLCAiIikucmVwbGFjZSgvXCsvZywgIi0iKS5yZXBsYWNlKC9cLy9nLCAiXyIpOwogICAgcmV0dXJuIGJ1ZmZlci50b1N0cmluZyhlbmMpOwogIH0KICBpZiAoZW5jID09PSAiaGV4IikgcmV0dXJuIEFycmF5LmZyb20ob3V0LCBiID0+IGIudG9TdHJpbmcoMTYpLnBhZFN0YXJ0KDIsICIwIikpLmpvaW4oIiIpOwogIGlmIChlbmMgPT09ICJiYXNlNjQiIHx8IGVuYyA9PT0gImJhc2U2NHVybCIpIHsKICAgIGxldCBiaW5hcnkgPSAiIjsKICAgIGZvciAoY29uc3QgYiBvZiBvdXQpIGJpbmFyeSArPSBTdHJpbmcuZnJvbUNoYXJDb2RlKGIpOwogICAgY29uc3QgYmFzZTY0ID0gYnRvYShiaW5hcnkpOwogICAgcmV0dXJuIGVuYyA9PT0gImJhc2U2NHVybCIgPyBiYXNlNjQucmVwbGFjZSgvPS9nLCAiIikucmVwbGFjZSgvXCsvZywgIi0iKS5yZXBsYWNlKC9cLy9nLCAiXyIpIDogYmFzZTY0OwogIH0KICBpZiAoZW5jID09PSAidXRmOCIgfHwgZW5jID09PSAidXRmLTgiKSByZXR1cm4gbmV3IFRleHREZWNvZGVyKCkuZGVjb2RlKG91dCk7CiAgcmV0dXJuIEFycmF5LmZyb20ob3V0LCBiID0+IFN0cmluZy5mcm9tQ2hhckNvZGUoYikpLmpvaW4oIiIpOwp9CmZ1bmN0aW9uIHdyYXBEaWdlc3QoZW5naW5lKSB7CiAgbGV0IGZpbmFsaXplZCA9IGZhbHNlOwogIGNvbnN0IGFwaSA9IHsKICAgIHVwZGF0ZShkYXRhLCBpbnB1dEVuY29kaW5nKSB7CiAgICAgIGlmIChmaW5hbGl6ZWQpIHRocm93IG5ldyBFcnJvcigiRGlnZXN0IGFscmVhZHkgZmluYWxpemVkIik7CiAgICAgIGVuZ2luZS51cGRhdGUoYnl0ZXNGcm9tKGRhdGEsIGlucHV0RW5jb2RpbmcpKTsKICAgICAgcmV0dXJuIGFwaTsKICAgIH0sCiAgICBkaWdlc3QoZW5jb2RpbmcpIHsKICAgICAgaWYgKGZpbmFsaXplZCkgdGhyb3cgbmV3IEVycm9yKCJEaWdlc3QgYWxyZWFkeSBmaW5hbGl6ZWQiKTsKICAgICAgZmluYWxpemVkID0gdHJ1ZTsKICAgICAgcmV0dXJuIG91dHB1dEJ5dGVzKGVuZ2luZS5kaWdlc3QoKSwgZW5jb2RpbmcpOwogICAgfQogIH07CiAgcmV0dXJuIGFwaTsKfQpleHBvcnQgZnVuY3Rpb24gY3JlYXRlSGFzaChhbGdvcml0aG0pIHsKICBjb25zdCBIYXNoID0gbm9ybWFsaXplQWxnb3JpdGhtKGFsZ29yaXRobSk7CiAgcmV0dXJuIHdyYXBEaWdlc3QoSGFzaCgpKTsKfQpleHBvcnQgZnVuY3Rpb24gY3JlYXRlSG1hYyhhbGdvcml0aG0sIGtleSkgewogIGNvbnN0IEhhc2ggPSBub3JtYWxpemVBbGdvcml0aG0oYWxnb3JpdGhtKTsKICBpZiAodHlwZW9mIGhhc2hsaWIuaG1hYyAhPT0gImZ1bmN0aW9uIikgdGhyb3cgbmV3IEVycm9yKCJoYXNoLmpzIEhNQUMgaXMgdW5hdmFpbGFibGUiKTsKICByZXR1cm4gd3JhcERpZ2VzdChoYXNobGliLmhtYWMoSGFzaCwgYnl0ZXNGcm9tKGtleSkpKTsKfQpleHBvcnQgZnVuY3Rpb24gcmFuZG9tQnl0ZXMoc2l6ZSwgY2FsbGJhY2spIHsKICBjb25zdCBsZW5ndGggPSBOdW1iZXIoc2l6ZSk7CiAgaWYgKCFOdW1iZXIuaXNTYWZlSW50ZWdlcihsZW5ndGgpIHx8IGxlbmd0aCA8IDApIHRocm93IG5ldyBSYW5nZUVycm9yKCJJbnZhbGlkIHJhbmRvbUJ5dGVzIHNpemUiKTsKICBjb25zdCBuYXRpdmVDcnlwdG8gPSBnbG9iYWxUaGlzLmNyeXB0bzsKICBpZiAoIW5hdGl2ZUNyeXB0bz8uZ2V0UmFuZG9tVmFsdWVzKSB0aHJvdyBuZXcgRXJyb3IoIlNlY3VyZSBicm93c2VyIHJhbmRvbSBnZW5lcmF0b3IgaXMgdW5hdmFpbGFibGU7IHVzZSBIVFRQUyIpOwogIGNvbnN0IGJ5dGVzID0gbmV3IFVpbnQ4QXJyYXkobGVuZ3RoKTsKICAvLyBXZWIgQ3J5cHRvIGxpbWl0cyBlYWNoIGdldFJhbmRvbVZhbHVlcyBjYWxsIHRvIDY1LDUzNiBieXRlcy4KICBmb3IgKGxldCBvZmZzZXQgPSAwOyBvZmZzZXQgPCBsZW5ndGg7IG9mZnNldCArPSA2NTUzNikgewogICAgbmF0aXZlQ3J5cHRvLmdldFJhbmRvbVZhbHVlcyhieXRlcy5zdWJhcnJheShvZmZzZXQsIE1hdGgubWluKG9mZnNldCArIDY1NTM2LCBsZW5ndGgpKSk7CiAgfQogIGNvbnN0IEIgPSBCdWZmZXJDdG9yKCk7CiAgY29uc3QgcmVzdWx0ID0gdHlwZW9mIEI/LmZyb20gPT09ICJmdW5jdGlvbiIgPyBCLmZyb20oYnl0ZXMpIDogYnl0ZXM7CiAgaWYgKHR5cGVvZiBjYWxsYmFjayA9PT0gImZ1bmN0aW9uIikgewogICAgcXVldWVNaWNyb3Rhc2soKCkgPT4gY2FsbGJhY2sobnVsbCwgcmVzdWx0KSk7CiAgICByZXR1cm4gdW5kZWZpbmVkOwogIH0KICByZXR1cm4gcmVzdWx0Owp9CmV4cG9ydCBmdW5jdGlvbiByYW5kb21GaWxsU3luYyh0YXJnZXQsIG9mZnNldCA9IDAsIHNpemUpIHsKICBpZiAoIUFycmF5QnVmZmVyLmlzVmlldyh0YXJnZXQpKSB0aHJvdyBuZXcgVHlwZUVycm9yKCJyYW5kb21GaWxsU3luYyB0YXJnZXQgbXVzdCBiZSBhIHR5cGVkIGFycmF5IG9yIEJ1ZmZlciIpOwogIGNvbnN0IHZpZXcgPSBuZXcgVWludDhBcnJheSh0YXJnZXQuYnVmZmVyLCB0YXJnZXQuYnl0ZU9mZnNldCwgdGFyZ2V0LmJ5dGVMZW5ndGgpOwogIGNvbnN0IHN0YXJ0ID0gTnVtYmVyKG9mZnNldCkgfHwgMDsKICBjb25zdCBsZW5ndGggPSBzaXplID09IG51bGwgPyB2aWV3Lmxlbmd0aCAtIHN0YXJ0IDogTnVtYmVyKHNpemUpOwogIGlmIChzdGFydCA8IDAgfHwgbGVuZ3RoIDwgMCB8fCBzdGFydCArIGxlbmd0aCA+IHZpZXcubGVuZ3RoKSB0aHJvdyBuZXcgUmFuZ2VFcnJvcigicmFuZG9tRmlsbFN5bmMgcmFuZ2UgaXMgb3V0IG9mIGJvdW5kcyIpOwogIGNvbnN0IG5hdGl2ZUNyeXB0byA9IGdsb2JhbFRoaXMuY3J5cHRvOwogIGlmICghbmF0aXZlQ3J5cHRvPy5nZXRSYW5kb21WYWx1ZXMpIHRocm93IG5ldyBFcnJvcigiU2VjdXJlIGJyb3dzZXIgcmFuZG9tIGdlbmVyYXRvciBpcyB1bmF2YWlsYWJsZTsgdXNlIEhUVFBTIik7CiAgZm9yIChsZXQgcG9zID0gc3RhcnQ7IHBvcyA8IHN0YXJ0ICsgbGVuZ3RoOyBwb3MgKz0gNjU1MzYpIHsKICAgIG5hdGl2ZUNyeXB0by5nZXRSYW5kb21WYWx1ZXModmlldy5zdWJhcnJheShwb3MsIE1hdGgubWluKHBvcyArIDY1NTM2LCBzdGFydCArIGxlbmd0aCkpKTsKICB9CiAgcmV0dXJuIHRhcmdldDsKfQpleHBvcnQgZnVuY3Rpb24gcmFuZG9tRmlsbCh0YXJnZXQsIG9mZnNldCwgc2l6ZSwgY2FsbGJhY2spIHsKICBpZiAodHlwZW9mIG9mZnNldCA9PT0gImZ1bmN0aW9uIikgeyBjYWxsYmFjayA9IG9mZnNldDsgb2Zmc2V0ID0gMDsgc2l6ZSA9IHVuZGVmaW5lZDsgfQogIGVsc2UgaWYgKHR5cGVvZiBzaXplID09PSAiZnVuY3Rpb24iKSB7IGNhbGxiYWNrID0gc2l6ZTsgc2l6ZSA9IHVuZGVmaW5lZDsgfQogIHRyeSB7CiAgICBjb25zdCByZXN1bHQgPSByYW5kb21GaWxsU3luYyh0YXJnZXQsIG9mZnNldCB8fCAwLCBzaXplKTsKICAgIGlmICh0eXBlb2YgY2FsbGJhY2sgPT09ICJmdW5jdGlvbiIpIHF1ZXVlTWljcm90YXNrKCgpID0+IGNhbGxiYWNrKG51bGwsIHJlc3VsdCkpOwogICAgcmV0dXJuIHR5cGVvZiBjYWxsYmFjayA9PT0gImZ1bmN0aW9uIiA/IHVuZGVmaW5lZCA6IHJlc3VsdDsKICB9IGNhdGNoIChlcnJvcikgewogICAgaWYgKHR5cGVvZiBjYWxsYmFjayA9PT0gImZ1bmN0aW9uIikgeyBxdWV1ZU1pY3JvdGFzaygoKSA9PiBjYWxsYmFjayhlcnJvcikpOyByZXR1cm4gdW5kZWZpbmVkOyB9CiAgICB0aHJvdyBlcnJvcjsKICB9Cn0KZXhwb3J0IGNvbnN0IHdlYmNyeXB0byA9IGdsb2JhbFRoaXMuY3J5cHRvOwpleHBvcnQgY29uc3QgZ2V0UmFuZG9tVmFsdWVzID0gKHZhbHVlKSA9PiBnbG9iYWxUaGlzLmNyeXB0by5nZXRSYW5kb21WYWx1ZXModmFsdWUpOwpleHBvcnQgY29uc3QgdGltaW5nU2FmZUVxdWFsID0gKGEsIGIpID0+IHsKICBjb25zdCBsZWZ0ID0gYnl0ZXNGcm9tKGEpLCByaWdodCA9IGJ5dGVzRnJvbShiKTsKICBpZiAobGVmdC5sZW5ndGggIT09IHJpZ2h0Lmxlbmd0aCkgdGhyb3cgbmV3IEVycm9yKCJJbnB1dCBidWZmZXJzIG11c3QgaGF2ZSB0aGUgc2FtZSBieXRlIGxlbmd0aCIpOwogIGxldCBkaWZmID0gMDsKICBmb3IgKGxldCBpID0gMDsgaSA8IGxlZnQubGVuZ3RoOyBpKyspIGRpZmYgfD0gbGVmdFtpXSBeIHJpZ2h0W2ldOwogIHJldHVybiBkaWZmID09PSAwOwp9OwpleHBvcnQgY29uc3QgZ2V0SGFzaGVzID0gKCkgPT4gT2JqZWN0LmtleXMoYWxnb3JpdGhtcyk7CmV4cG9ydCBkZWZhdWx0IHsgY3JlYXRlSGFzaCwgY3JlYXRlSG1hYywgcmFuZG9tQnl0ZXMsIHJhbmRvbUZpbGxTeW5jLCByYW5kb21GaWxsLCB3ZWJjcnlwdG8sIGdldFJhbmRvbVZhbHVlcywgdGltaW5nU2FmZUVxdWFsLCBnZXRIYXNoZXMgfTsK"
-  }
-}
+<!-- Browser Buffer UMD polyfill. The GramJS browser bundle also embeds Buffer internally. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/buffer/6.0.3/buffer.min.js"
+        onload="(function(){var B=(window.buffer&&window.buffer.Buffer)||window.Buffer;if(B&&!window.Buffer)window.Buffer=B;if(!window.global)window.global=window;}())"
+        onerror="console.warn('[KesugGram] External Buffer global polyfill did not load; the GramJS UMD bundle has its own bundled Buffer.');"></script>
+<script>
+(function () {
+  if (!window.global) window.global = window;
+  if (!window.Buffer && window.buffer && window.buffer.Buffer) window.Buffer = window.buffer.Buffer;
+})();
 </script>
 </head>
 <body>
@@ -245,7 +247,7 @@ button:disabled{opacity:.42;cursor:not-allowed}
 <input id="storyMusicInput" type="file" accept="audio/*" hidden>
 <input id="wallpaperInput" type="file" accept="image/*" hidden>
 <input id="profileAvatarInput" type="file" accept="image/*" hidden>
-<script type="module">
+<script>
 (() => {
 'use strict';
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
@@ -414,7 +416,7 @@ restore();applySettings();if(!settings.motion)document.documentElement.classList
 
 
 
-<script type="module">
+<script>
 const API_ID = 17349;
 // Общие учётные данные приложения KesugGram. Они одинаковы для всех пользователей.
 // В публичном клиентском HTML API_HASH виден в исходном коде — это неизбежно без backend.
@@ -425,16 +427,8 @@ const SESSION_KEY = 'kesuggram:telegram-session:v1';
 // Do NOT import the normal `telegram` Node entry: it can pull in `net`, `socks`, etc.
 const GRAMJS_BROWSER_BUNDLES = [
   {
-    name: 'jsDelivr · telegram@browser',
-    url: 'https://cdn.jsdelivr.net/npm/telegram@browser/browser/telegram.js'
-  },
-  {
-    name: 'UNPKG · telegram@browser',
-    url: 'https://unpkg.com/telegram@browser/browser/telegram.js'
-  },
-  {
-    name: 'jsDelivr · telegram 2.26.21 browser build',
-    url: 'https://cdn.jsdelivr.net/npm/telegram@2.26.21/browser/telegram.js'
+    name: 'Official GramJS browser UMD · v2.17.4 release asset',
+    url: 'https://github.com/gram-js/gramjs/releases/download/v2.17.4/telegram.js'
   }
 ];
 const $ = (selector) => document.querySelector(selector);
@@ -489,72 +483,71 @@ function explainGramError(error) {
 }
 
 async function installBrowserNodeGlobals() {
-  // GramJS и некоторые его зависимости обращаются к Node Buffer.
-  // В браузере такого глобала нет, поэтому загружаем совместимый полифилл
-  // ДО импорта самого GramJS (важен именно такой порядок).
-  if (typeof globalThis.Buffer === 'undefined') {
-    const providers = [
-      'https://esm.unpkg.com/buffer@6.0.3?target=esnext',
-      'https://cdn.jsdelivr.net/npm/buffer@6.0.3/+esm'
-    ];
-    let lastError = null;
-    for (const url of providers) {
-      try {
-        const bufferModule = await import(url);
-        const BufferCtor = bufferModule.Buffer || bufferModule.default?.Buffer || bufferModule.default;
-        if (typeof BufferCtor?.from === 'function' && typeof BufferCtor?.alloc === 'function') {
-          globalThis.Buffer = BufferCtor;
-          // `global` встречается в некоторых Node-ориентированных зависимостях.
-          if (typeof globalThis.global === 'undefined') globalThis.global = globalThis;
-          return BufferCtor;
-        }
-        throw new Error('CDN загрузил модуль buffer, но не экспортировал совместимый Buffer.');
-      } catch (error) {
-        lastError = error;
-      }
-    }
-    throw new Error('Не удалось загрузить браузерный Buffer-полифилл. Проверь доступ к UNPKG ESM и jsDelivr. ' + (lastError?.message || ''));
-  }
+  // The official browser UMD bundle includes its Buffer dependency through
+  // GramJS's webpack ProvidePlugin. Expose a global Buffer as well when the
+  // standalone CDN polyfill has loaded, for browser-side helpers.
   if (typeof globalThis.global === 'undefined') globalThis.global = globalThis;
-  return globalThis.Buffer;
+
+  if (typeof globalThis.Buffer === 'undefined' && globalThis.buffer?.Buffer) {
+    globalThis.Buffer = globalThis.buffer.Buffer;
+  }
+
+  if (typeof globalThis.Buffer !== 'undefined') {
+    console.info('[KesugGram] Buffer polyfill ready.');
+  } else {
+    console.info('[KesugGram] Buffer global is not present; using Buffer bundled inside official GramJS UMD.');
+  }
+  return globalThis.Buffer || null;
 }
 
 async function installBrowserCrypto() {
-  // Node's crypto.createHash is synchronous and streaming. WebCrypto subtle.digest
-  // is asynchronous and cannot replace it directly. The import map routes only
-  // Node-style `crypto` imports to a small hash.js-backed compatibility module.
-  // The native window.crypto object is NEVER overwritten; it supplies CSPRNG bytes.
-  let cryptoModule;
-  try {
-    cryptoModule = await import('crypto');
-  } catch (error) {
-    throw new Error('Не удалось загрузить hash.js crypto-shim: ' + (error?.message || error));
-  }
-  const api = (typeof cryptoModule.createHash === 'function')
-    ? cryptoModule
-    : (cryptoModule.default && typeof cryptoModule.default.createHash === 'function' ? cryptoModule.default : null);
-  if (!api || typeof api.createHmac !== 'function' || typeof api.randomBytes !== 'function') {
-    throw new Error('hash.js crypto-shim не экспортировал createHash/createHmac/randomBytes.');
+  // hash.js is loaded as an optional browser helper. We do NOT overwrite
+  // window.crypto: Web Crypto is the browser's secure RNG implementation.
+  // The official GramJS browser bundle is built with its browser-specific
+  // sources and webpack fallback crypto:false, so Node crypto-browserify is
+  // deliberately not injected into this bundle.
+  let hashModule = null;
+  let lastError = null;
+  const urls = [
+    'https://cdn.jsdelivr.net/npm/hash.js@1.1.7/+esm',
+    'https://esm.unpkg.com/hash.js@1.1.7?target=es2020'
+  ];
+
+  for (const url of urls) {
+    try {
+      hashModule = await import(url); // dynamic import works inside a classic script
+      break;
+    } catch (error) {
+      lastError = error;
+      console.warn('[KesugGram] hash.js CDN failed:', url, error);
+    }
   }
 
-  // Проверяем оба алгоритма и HMAC до передачи crypto-модуля GramJS.
-  const sha256 = api.createHash('sha256').update('KesugGram crypto self-test').digest('hex');
-  if (sha256 !== '1260259f4ae0fc5de53f75e9a14d2a35b1270dff440d98cb22c03289830ac600') {
-    throw new Error('Проверка SHA-256 через hash.js не пройдена.');
+  if (!hashModule) {
+    console.warn('[KesugGram] hash.js helper unavailable; continue with browser-native crypto in the UMD bundle.', lastError);
+    globalThis.__KESUGRAM_HASHJS__ = null;
+    return null;
   }
-  const sha1 = api.createHash('sha1').update('abc').digest('hex');
-  if (sha1 !== 'a9993e364706816aba3e25717850c26c9cd0d89d') {
-    throw new Error('Проверка SHA-1 через hash.js не пройдена.');
+
+  const hash = hashModule.default || hashModule;
+  if (typeof hash.sha1 !== 'function' || typeof hash.sha256 !== 'function' || typeof hash.hmac !== 'function') {
+    console.warn('[KesugGram] hash.js loaded but expected SHA/HMAC exports were not found.');
+    globalThis.__KESUGRAM_HASHJS__ = null;
+    return null;
   }
-  const mac = api.createHmac('sha256', 'kesuggram-test-key').update('KesugGram HMAC self-test').digest('hex');
-  if (mac !== '5c6ed6647beccd860679f2de33eee4e21411287f19224f8954f545b371f79acc') {
-    throw new Error('Проверка HMAC-SHA256 через hash.js не пройдена.');
+
+  const sha1 = hash.sha1().update('abc').digest('hex');
+  const sha256 = hash.sha256().update('abc').digest('hex');
+  const hmac = hash.hmac(hash.sha256, 'key').update('The quick brown fox jumps over the lazy dog').digest('hex');
+  if (sha1 !== 'a9993e364706816aba3e25717850c26c9cd0d89d' ||
+      sha256 !== 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad' ||
+      hmac !== 'f7bc83f430538424b13298e6aa6fb143ef4d59a14946175997479dbc2d1a3cd8') {
+    throw new Error('Проверка hash.js SHA-1/SHA-256/HMAC завершилась ошибкой.');
   }
-  const random = api.randomBytes(16);
-  if (!random || random.length !== 16) throw new Error('Проверка randomBytes через Web Crypto не пройдена.');
-  globalThis.__KESUGRAM_NODE_CRYPTO__ = api;
-  console.info('[KesugGram] Browser crypto shim ready: hash.js SHA-1/SHA-2 + Web Crypto CSPRNG');
-  return api;
+
+  globalThis.__KESUGRAM_HASHJS__ = hash;
+  console.info('[KesugGram] hash.js SHA-1/SHA-256/HMAC self-tests passed.');
+  return hash;
 }
 
 function loadClassicScript(url) {
@@ -562,16 +555,64 @@ function loadClassicScript(url) {
     const script = document.createElement('script');
     script.src = url;
     script.async = true;
-    script.crossOrigin = 'anonymous';
     script.referrerPolicy = 'strict-origin-when-cross-origin';
     script.dataset.kesuggramGramjs = 'true';
-    script.onload = () => resolve();
+    script.onload = () => resolve(script);
     script.onerror = () => {
       script.remove();
-      reject(new Error(`Браузерный bundle не загрузился: ${url}`));
+      reject(new Error(`Не удалось загрузить обычный JavaScript UMD-скрипт: ${url}. Проверь ответ сервера, MIME type и доступ к GitHub Releases.`));
     };
     document.head.appendChild(script);
   });
+}
+
+// GitHub Releases sometimes serves .js assets as application/octet-stream.
+// Fetching the asset and re-serving it as a same-origin Blob gives the browser
+// an explicit JavaScript MIME type. If CORS is denied, try a normal classic
+// <script src> request as a fallback and report its real outcome.
+async function loadGramJSBundle(bundle) {
+  let fetchError = null;
+
+  if (typeof fetch === 'function' && typeof URL.createObjectURL === 'function') {
+    try {
+      const response = await fetch(bundle.url, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'omit',
+        cache: 'force-cache'
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status} ${response.statusText || ''}`.trim());
+      }
+
+      const source = await response.text();
+      if (!source || source.length < 100000 || /^\s*<!doctype html/i.test(source) || /^\s*<html/i.test(source)) {
+        throw new Error('Вместо JavaScript bundle сервер вернул пустой или HTML-ответ.');
+      }
+
+      const blobUrl = URL.createObjectURL(new Blob([source], { type: 'text/javascript;charset=utf-8' }));
+      try {
+        await loadClassicScript(blobUrl);
+      } finally {
+        // Keep the Blob URL alive briefly for lazy chunks/source-map lookups.
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 30000);
+      }
+      console.info('[KesugGram] UMD bundle loaded through JavaScript Blob (MIME normalized).');
+      return 'blob';
+    } catch (error) {
+      fetchError = error;
+      console.warn('[KesugGram] Fetch→Blob path unavailable; trying a normal classic script tag.', error);
+    }
+  }
+
+  try {
+    await loadClassicScript(bundle.url);
+    console.info('[KesugGram] UMD bundle loaded as a classic external script.');
+    return 'script';
+  } catch (scriptError) {
+    const detail = fetchError ? ` Fetch/CORS: ${fetchError.message}.` : '';
+    throw new Error(`Не удалось загрузить браузерный GramJS UMD bundle.${detail} Script: ${scriptError.message}`);
+  }
 }
 
 async function loadGramJS() {
@@ -581,43 +622,45 @@ async function loadGramJS() {
   window.__KESUGGRAM_GRAMJS_LOADING__ = (async () => {
     setStatus('Подготавливаю браузерную среду…');
     await installBrowserNodeGlobals();
-    setStatus('Проверяю совместимость криптографии…');
+    setStatus('Проверяю браузерные хеш-функции…');
     await installBrowserCrypto();
-    setStatus('Загружаю специализированную браузерную сборку GramJS…');
+    setStatus('Загружаю браузерный UMD bundle GramJS…');
 
-    let lastLoadError = null;
-    for (const bundle of GRAMJS_BROWSER_BUNDLES) {
-      try {
-        console.info(`[KesugGram] Загружаю browser bundle: ${bundle.name}`, bundle.url);
-        await loadClassicScript(bundle.url);
+    const bundle = GRAMJS_BROWSER_BUNDLES[0];
+    console.info(`[KesugGram] Загружаю UMD bundle: ${bundle.name}`, bundle.url);
+    const loadMode = await loadGramJSBundle(bundle);
 
-        // webpack.config.js in GramJS sets library="telegram" and libraryTarget="umd".
-        const mod = window.telegram || globalThis.telegram;
-        const TelegramClient = mod?.TelegramClient;
-        const StringSession = mod?.sessions?.StringSession || mod?.StringSession;
-        const Api = mod?.Api || mod?.tl?.Api;
-
-        if (typeof TelegramClient !== 'function' || typeof StringSession !== 'function') {
-          throw new Error(`${bundle.name}: UMD bundle загружен, но не экспортировал telegram.TelegramClient и telegram.sessions.StringSession.`);
-        }
-
-        console.info(`[KesugGram] Browser bundle готов через ${bundle.name}:`, {
-          TelegramClient: TelegramClient.name || '(anonymous class)',
-          StringSession: StringSession.name || '(anonymous class)',
-          clientType: typeof TelegramClient,
-          sessionType: typeof StringSession,
-          exports: Object.keys(mod || {}).slice(0, 24)
-        });
-
-        gram = { TelegramClient, StringSession, Api, provider: bundle.name };
-        return gram;
-      } catch (error) {
-        lastLoadError = error;
-        console.warn(`[KesugGram] Browser bundle ${bundle.name} недоступен или несовместим:`, error);
-      }
+    // The browser UMD build exposes library="telegram" globally.
+    console.info(`[KesugGram] UMD load mode: ${loadMode}`);
+    // GramJS webpack config declares library="telegram" and libraryTarget="umd".
+    const mod = window.telegram || globalThis.telegram;
+    if (!mod) {
+      throw new Error('UMD-скрипт загрузился, но глобальный объект window.telegram не найден. Проверь MIME type и содержимое telegram.js.');
     }
 
-    throw new Error('Не удалось загрузить готовую браузерную сборку GramJS. Проверены jsDelivr и UNPKG (telegram@browser/browser/telegram.js). Последняя ошибка: ' + (lastLoadError?.message || lastLoadError));
+    // Friendly alias requested by the KesugGram client.
+    window.gramjs = mod;
+
+    const TelegramClient = mod.TelegramClient;
+    const StringSession = mod.sessions?.StringSession || mod.StringSession;
+    const Api = mod.Api || mod.tl?.Api;
+
+    if (typeof TelegramClient !== 'function' || typeof StringSession !== 'function') {
+      throw new Error('В window.gramjs отсутствуют TelegramClient или sessions.StringSession. Возможно, CDN вернул не UMD bundle.');
+    }
+
+    console.info('[KesugGram] Browser UMD bundle ready:', {
+      provider: bundle.name,
+      globalName: 'window.gramjs',
+      TelegramClient: TelegramClient.name || '(anonymous class)',
+      StringSession: StringSession.name || '(anonymous class)',
+      clientType: typeof TelegramClient,
+      sessionType: typeof StringSession,
+      exports: Object.keys(mod).slice(0, 24)
+    });
+
+    gram = { TelegramClient, StringSession, Api, provider: bundle.name };
+    return gram;
   })();
 
   try {
@@ -668,6 +711,7 @@ function resetAuthForm(message='') {
 }
 
 async function authSubmit(event) {
+  console.log("ПОГНАЛИ! Попытка коннекта через бандл...");
   console.log("ПОГНАЛИ! Функция вызвана!");
   event?.preventDefault?.();
   setStatus('Проверяю данные…');
@@ -929,7 +973,7 @@ $('#messages').addEventListener('scroll', () => {
   if (id) loadTelegramHistory(id, true);
 }, { passive:true });
 
-// Module-local auth binding: the button is a normal button, not an inline handler.
+// Classic-script auth binding: the button is connected directly to authSubmit.
 // Enter in either phone/code/password input activates the same click handler.
 form.noValidate = true;
 submitBtn.type = 'button';
@@ -970,7 +1014,7 @@ if (localStorage.getItem(SESSION_KEY)) {
 // Keep demo accessible when the ESM CDN is blocked or unavailable.
 window.addEventListener('unhandledrejection', (event) => {
   if (String(event.reason?.message || '').includes('Failed to fetch dynamically imported module')) {
-    setStatus('Не удалось загрузить браузерный bundle GramJS с jsDelivr или UNPKG. Демо-режим остаётся доступен.', 'error');
+    setStatus('Не удалось загрузить браузерный UMD bundle GramJS. Проверь доступ к GitHub Releases, CORS и MIME type ответа. Демо-режим остаётся доступен.', 'error');
   }
 });
 </script>
