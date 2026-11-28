@@ -473,13 +473,47 @@ function explainGramError(error) {
     return seconds ? `Telegram просит подождать ${seconds} сек. Не отправляй новые запросы.` : 'Telegram временно ограничил запросы. Подожди и попробуй позже.';
   }
   if (code.includes('AUTH_KEY_UNREGISTERED')) return 'Сохранённая сессия больше не действует. Войди по номеру ещё раз.';
+  if (code.includes('BUFFER IS NOT DEFINED')) return 'Не загрузился Buffer-полифилл для браузера. Проверь доступ к esm.sh и jsdelivr, затем обнови страницу.';
   if (code.includes('FAILED TO FETCH DYNAMICALLY IMPORTED MODULE') || code.includes('IMPORTING A MODULE SCRIPT FAILED') || code.includes('ERR_NAME_NOT_RESOLVED') || code.includes('ERR_CONNECTION') || code.includes('FETCH FAILED')) return 'Не загрузилась библиотека GramJS с esm.sh. Проверь доступ к esm.sh, отключи блокировщик для сайта или открой KesugGram через GitHub Pages по HTTPS.';
   if (code.includes('NETWORK') || code.includes('WEBSOCKET') || code.includes('CONNECTION')) return 'Не удалось подключиться к Telegram по WebSocket. Проверь интернет/VPN и попробуй позже.';
   return String(error?.message || error || 'Неизвестная ошибка Telegram').replace(/^Error:\s*/,'').slice(0,240);
 }
 
+async function installBrowserNodeGlobals() {
+  // GramJS и некоторые его зависимости обращаются к Node Buffer.
+  // В браузере такого глобала нет, поэтому загружаем совместимый полифилл
+  // ДО импорта самого GramJS (важен именно такой порядок).
+  if (typeof globalThis.Buffer === 'undefined') {
+    const providers = [
+      'https://esm.sh/buffer@6.0.3?bundle',
+      'https://cdn.jsdelivr.net/npm/buffer@6.0.3/+esm'
+    ];
+    let lastError = null;
+    for (const url of providers) {
+      try {
+        const bufferModule = await import(url);
+        const BufferCtor = bufferModule.Buffer || bufferModule.default?.Buffer || bufferModule.default;
+        if (typeof BufferCtor?.from === 'function' && typeof BufferCtor?.alloc === 'function') {
+          globalThis.Buffer = BufferCtor;
+          // `global` встречается в некоторых Node-ориентированных зависимостях.
+          if (typeof globalThis.global === 'undefined') globalThis.global = globalThis;
+          return BufferCtor;
+        }
+        throw new Error('CDN загрузил модуль buffer, но не экспортировал совместимый Buffer.');
+      } catch (error) {
+        lastError = error;
+      }
+    }
+    throw new Error('Не удалось загрузить браузерный Buffer-полифилл. Проверь доступ к esm.sh и jsdelivr. ' + (lastError?.message || ''));
+  }
+  if (typeof globalThis.global === 'undefined') globalThis.global = globalThis;
+  return globalThis.Buffer;
+}
+
 async function loadGramJS() {
   if (gram) return gram;
+  setStatus('Подготавливаю браузерную среду…');
+  await installBrowserNodeGlobals();
   setStatus('Загружаю GramJS из esm.sh…');
   const mod = await import(GRAMJS_URL);
   const sessions = mod.sessions || mod.default?.sessions;
