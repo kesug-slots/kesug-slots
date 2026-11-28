@@ -420,19 +420,21 @@ const API_ID = 17349;
 // В публичном клиентском HTML API_HASH виден в исходном коде — это неизбежно без backend.
 const API_HASH = '344583e45741c457fe1862106095a5eb';
 const SESSION_KEY = 'kesuggram:telegram-session:v1';
-// Browser ESM CDN fallback list. UNPKG ESM supports target=esnext;
-// jsDelivr +esm is a second independent CDN route. Neither URL is a separately
-// published official GramJS browser bundle; each CDN transforms the npm package.
-const GRAMJS_CDN_PROVIDERS = [
+// GramJS browser-specific npm dist-tag. The npm package is named `telegram`,
+// and its webpack output is browser/telegram.js (UMD global: window.telegram).
+// Do NOT import the normal `telegram` Node entry: it can pull in `net`, `socks`, etc.
+const GRAMJS_BROWSER_BUNDLES = [
   {
-    name: 'UNPKG ESM',
-    client: 'https://esm.unpkg.com/telegram@2.26.22?target=esnext',
-    sessions: 'https://esm.unpkg.com/telegram@2.26.22/sessions/index.js?target=esnext'
+    name: 'jsDelivr · telegram@browser',
+    url: 'https://cdn.jsdelivr.net/npm/telegram@browser/browser/telegram.js'
   },
   {
-    name: 'jsDelivr +esm',
-    client: 'https://cdn.jsdelivr.net/npm/telegram@2.26.22/+esm',
-    sessions: 'https://cdn.jsdelivr.net/npm/telegram@2.26.22/sessions/index.js/+esm'
+    name: 'UNPKG · telegram@browser',
+    url: 'https://unpkg.com/telegram@browser/browser/telegram.js'
+  },
+  {
+    name: 'jsDelivr · telegram 2.26.21 browser build',
+    url: 'https://cdn.jsdelivr.net/npm/telegram@2.26.21/browser/telegram.js'
   }
 ];
 const $ = (selector) => document.querySelector(selector);
@@ -477,11 +479,11 @@ function explainGramError(error) {
   }
   if (code.includes('AUTH_KEY_UNREGISTERED')) return 'Сохранённая сессия больше не действует. Войди по номеру ещё раз.';
   if (code.includes('CLASS CONSTRUCTOR') && code.includes('WITHOUT')) return 'GramJS или одна из его зависимостей вызвала ES-класс как обычную функцию. В консоли указаны этап и stack trace; пришли их, если ошибка повторится.';
-  if (code.includes('BUFFER IS NOT DEFINED')) return 'Не загрузился Buffer-полифилл для браузера. Проверь доступ к UNPKG ESM и jsDelivr, затем обнови страницу.';
-  if (code.includes('UNENV') && (code.includes('CRYPTO.CREATEHASH') || code.includes('CRYPTO.CREATEHMAC') || code.includes('CRYPTO.RANDOMBYTES'))) return 'GramJS получил unenv вместо hash.js crypto-shim. Проверь import map и доступ к UNPKG ESM/jsDelivr.';
+  if (code.includes('BUFFER IS NOT DEFINED')) return 'Не загрузился Buffer-полифилл для браузера. Проверь доступ к CDN с browser bundle и обнови страницу.';
+  if (code.includes('UNENV') && (code.includes('CRYPTO.CREATEHASH') || code.includes('CRYPTO.CREATEHMAC') || code.includes('CRYPTO.RANDOMBYTES'))) return 'GramJS получил unenv вместо hash.js crypto-shim. Проверь браузерный crypto-shim и доступ к hash.js CDN.';
   if (code.includes('CLASS CONSTRUCTOR') && (code.includes('WITHOUT') || code.includes('NEW'))) return 'Ошибка конструктора возникла внутри одной из ESM-зависимостей. Проверь полный Stack Trace и URL проблемного модуля.';
   if (code.includes('HASH.JS CRYPTO-SHIM') || code.includes('CREATEHASH IS NOT A FUNCTION')) return 'Не удалось загрузить hash.js crypto-shim. Проверь доступ к UNPKG ESM/jsDelivr и обнови страницу.';
-  if (code.includes('FAILED TO FETCH DYNAMICALLY IMPORTED MODULE') || code.includes('IMPORTING A MODULE SCRIPT FAILED') || code.includes('ERR_NAME_NOT_RESOLVED') || code.includes('ERR_CONNECTION') || code.includes('FETCH FAILED')) return 'Не загрузилась библиотека GramJS с UNPKG ESM или jsDelivr. Проверь доступ к CDN, отключи блокировщик для сайта или открой KesugGram через GitHub Pages по HTTPS.';
+  if (code.includes('FAILED TO FETCH DYNAMICALLY IMPORTED MODULE') || code.includes('IMPORTING A MODULE SCRIPT FAILED') || code.includes('ERR_NAME_NOT_RESOLVED') || code.includes('ERR_CONNECTION') || code.includes('FETCH FAILED')) return 'Не загрузился браузерный bundle GramJS с jsDelivr или UNPKG. Проверь доступ к CDN, блокировщик и GitHub Pages по HTTPS.';
   if (code.includes('NETWORK') || code.includes('WEBSOCKET') || code.includes('CONNECTION')) return 'Не удалось подключиться к Telegram по WebSocket. Проверь интернет/VPN и попробуй позже.';
   return String(error?.message || error || 'Неизвестная ошибка Telegram').replace(/^Error:\s*/,'').slice(0,240);
 }
@@ -555,42 +557,74 @@ async function installBrowserCrypto() {
   return api;
 }
 
+function loadClassicScript(url) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = url;
+    script.async = true;
+    script.crossOrigin = 'anonymous';
+    script.referrerPolicy = 'strict-origin-when-cross-origin';
+    script.dataset.kesuggramGramjs = 'true';
+    script.onload = () => resolve();
+    script.onerror = () => {
+      script.remove();
+      reject(new Error(`Браузерный bundle не загрузился: ${url}`));
+    };
+    document.head.appendChild(script);
+  });
+}
+
 async function loadGramJS() {
   if (gram) return gram;
-  setStatus('Подготавливаю браузерную среду…');
-  await installBrowserNodeGlobals();
-  setStatus('Подготавливаю Node crypto для браузера…');
-  await installBrowserCrypto();
-  setStatus('Загружаю GramJS с UNPKG ESM / jsDelivr…');
+  if (window.__KESUGGRAM_GRAMJS_LOADING__) return window.__KESUGGRAM_GRAMJS_LOADING__;
 
-  let lastLoadError = null;
-  for (const provider of GRAMJS_CDN_PROVIDERS) {
-    try {
-      console.info(`[KesugGram] Пробую CDN: ${provider.name}`);
-      const [mod, sessionsMod] = await Promise.all([
-        import(provider.client),
-        import(provider.sessions)
-      ]);
-      const TelegramClient = mod.TelegramClient || mod.default?.TelegramClient;
-      const StringSession = sessionsMod.StringSession || sessionsMod.default?.StringSession;
-      const Api = mod.Api || mod.default?.Api;
-      if (typeof TelegramClient !== 'function' || typeof StringSession !== 'function') {
-        throw new Error(`${provider.name}: CDN не экспортировал TelegramClient/StringSession.`);
+  window.__KESUGGRAM_GRAMJS_LOADING__ = (async () => {
+    setStatus('Подготавливаю браузерную среду…');
+    await installBrowserNodeGlobals();
+    setStatus('Проверяю совместимость криптографии…');
+    await installBrowserCrypto();
+    setStatus('Загружаю специализированную браузерную сборку GramJS…');
+
+    let lastLoadError = null;
+    for (const bundle of GRAMJS_BROWSER_BUNDLES) {
+      try {
+        console.info(`[KesugGram] Загружаю browser bundle: ${bundle.name}`, bundle.url);
+        await loadClassicScript(bundle.url);
+
+        // webpack.config.js in GramJS sets library="telegram" and libraryTarget="umd".
+        const mod = window.telegram || globalThis.telegram;
+        const TelegramClient = mod?.TelegramClient;
+        const StringSession = mod?.sessions?.StringSession || mod?.StringSession;
+        const Api = mod?.Api || mod?.tl?.Api;
+
+        if (typeof TelegramClient !== 'function' || typeof StringSession !== 'function') {
+          throw new Error(`${bundle.name}: UMD bundle загружен, но не экспортировал telegram.TelegramClient и telegram.sessions.StringSession.`);
+        }
+
+        console.info(`[KesugGram] Browser bundle готов через ${bundle.name}:`, {
+          TelegramClient: TelegramClient.name || '(anonymous class)',
+          StringSession: StringSession.name || '(anonymous class)',
+          clientType: typeof TelegramClient,
+          sessionType: typeof StringSession,
+          exports: Object.keys(mod || {}).slice(0, 24)
+        });
+
+        gram = { TelegramClient, StringSession, Api, provider: bundle.name };
+        return gram;
+      } catch (error) {
+        lastLoadError = error;
+        console.warn(`[KesugGram] Browser bundle ${bundle.name} недоступен или несовместим:`, error);
       }
-      console.info(`[KesugGram] GramJS exports загружены через ${provider.name}:`, {
-        TelegramClient: TelegramClient.name || '(anonymous class)',
-        StringSession: StringSession.name || '(anonymous class)',
-        clientType: typeof TelegramClient,
-        sessionType: typeof StringSession
-      });
-      gram = { TelegramClient, StringSession, Api, provider: provider.name };
-      return gram;
-    } catch (error) {
-      lastLoadError = error;
-      console.warn(`[KesugGram] CDN ${provider.name} недоступен или несовместим:`, error);
     }
+
+    throw new Error('Не удалось загрузить готовую браузерную сборку GramJS. Проверены jsDelivr и UNPKG (telegram@browser/browser/telegram.js). Последняя ошибка: ' + (lastLoadError?.message || lastLoadError));
+  })();
+
+  try {
+    return await window.__KESUGGRAM_GRAMJS_LOADING__;
+  } finally {
+    window.__KESUGGRAM_GRAMJS_LOADING__ = null;
   }
-  throw new Error('GramJS не загрузился ни через UNPKG ESM, ни через jsDelivr +esm. Последняя ошибка: ' + (lastLoadError?.message || lastLoadError));
 }
 
 function askTelegramChallenge(step, hint='') {
@@ -688,6 +722,7 @@ async function authSubmit(event) {
 
     let phoneWasUsed = false;
     authStage = 'подключение и авторизация Telegram';
+    console.log('LOG: Попытка коннекта к Vesta (DC2)...');
     await telegramClient.start({
       phoneNumber: async () => {
         if (phone && !phoneWasUsed) { phoneWasUsed = true; return phone; }
@@ -898,6 +933,7 @@ $('#messages').addEventListener('scroll', () => {
 // Enter in either phone/code/password input activates the same click handler.
 form.noValidate = true;
 submitBtn.type = 'button';
+window.authSubmit = authSubmit;
 submitBtn.addEventListener('click', authSubmit);
 form.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' && event.target instanceof HTMLInputElement && event.target.type !== 'checkbox') {
@@ -934,7 +970,7 @@ if (localStorage.getItem(SESSION_KEY)) {
 // Keep demo accessible when the ESM CDN is blocked or unavailable.
 window.addEventListener('unhandledrejection', (event) => {
   if (String(event.reason?.message || '').includes('Failed to fetch dynamically imported module')) {
-    setStatus('Не удалось загрузить GramJS с UNPKG ESM или jsDelivr. Демо-режим остаётся доступен.', 'error');
+    setStatus('Не удалось загрузить браузерный bundle GramJS с jsDelivr или UNPKG. Демо-режим остаётся доступен.', 'error');
   }
 });
 </script>
