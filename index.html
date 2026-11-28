@@ -427,7 +427,7 @@ const SESSION_KEY = 'kesuggram:telegram-session:v1';
 // Do NOT import the normal `telegram` Node entry: it can pull in `net`, `socks`, etc.
 const GRAMJS_BROWSER_BUNDLES = [
   {
-    name: 'Official GramJS browser UMD · v2.17.4 release asset',
+    name: 'Official GramJS browser UMD · v2.17.4 (legacy schema; runtime TL check enabled)',
     url: 'https://github.com/gram-js/gramjs/releases/download/v2.17.4/telegram.js'
   }
 ];
@@ -472,6 +472,7 @@ function explainGramError(error) {
     return seconds ? `Telegram просит подождать ${seconds} сек. Не отправляй новые запросы.` : 'Telegram временно ограничил запросы. Подожди и попробуй позже.';
   }
   if (code.includes('AUTH_KEY_UNREGISTERED')) return 'Сохранённая сессия больше не действует. Войди по номеру ещё раз.';
+  if (code.includes('COULD NOT FIND A MATCHING CONSTRUCTOR ID') || code.includes('MISSING MTPROTO ENTITY') || code.includes('TYPENOTFOUNDERROR')) return 'GramJS получил TL-конструктор, которого нет в загруженной схеме. Это нельзя безопасно игнорировать без проверки авторизации; проверь TL schema diagnostics в консоли.';
   if (code.includes('CLASS CONSTRUCTOR') && code.includes('WITHOUT')) return 'GramJS или одна из его зависимостей вызвала ES-класс как обычную функцию. В консоли указаны этап и stack trace; пришли их, если ошибка повторится.';
   if (code.includes('BUFFER IS NOT DEFINED')) return 'Не загрузился Buffer-полифилл для браузера. Проверь доступ к CDN с browser bundle и обнови страницу.';
   if (code.includes('UNENV') && (code.includes('CRYPTO.CREATEHASH') || code.includes('CRYPTO.CREATEHMAC') || code.includes('CRYPTO.RANDOMBYTES'))) return 'GramJS получил unenv вместо hash.js crypto-shim. Проверь браузерный crypto-shim и доступ к hash.js CDN.';
@@ -480,6 +481,69 @@ function explainGramError(error) {
   if (code.includes('FAILED TO FETCH DYNAMICALLY IMPORTED MODULE') || code.includes('IMPORTING A MODULE SCRIPT FAILED') || code.includes('ERR_NAME_NOT_RESOLVED') || code.includes('ERR_CONNECTION') || code.includes('FETCH FAILED')) return 'Не загрузился браузерный bundle GramJS с jsDelivr или UNPKG. Проверь доступ к CDN, блокировщик и GitHub Pages по HTTPS.';
   if (code.includes('NETWORK') || code.includes('WEBSOCKET') || code.includes('CONNECTION')) return 'Не удалось подключиться к Telegram по WebSocket. Проверь интернет/VPN и попробуй позже.';
   return String(error?.message || error || 'Неизвестная ошибка Telegram').replace(/^Error:\s*/,'').slice(0,240);
+}
+
+
+// A TypeNotFoundError is not safe to ignore blindly: the unknown constructor
+// may be the authorization result itself. We only recover when Telegram
+// independently confirms the session with updates.getState.
+function isTlDecodeError(error) {
+  const text = [error?.name, error?.message, error?.errorMessage, error?.stack]
+    .filter(Boolean).join(' ').toLowerCase();
+  return text.includes('could not find a matching constructor id') ||
+    text.includes('missing mtproto entity') ||
+    text.includes('typenotfounderror');
+}
+
+function extractTlConstructorId(error) {
+  const text = [error?.message, error?.errorMessage, error?.stack]
+    .filter(Boolean).join(' ');
+  const match = text.match(/(?:constructor\s+id|read with id|entity for id|id)\s*[:#]?\s*(0x[0-9a-f]+|\d{7,})/i);
+  if (!match) return '';
+  const value = /^0x/i.test(match[1]) ? Number.parseInt(match[1], 16) : Number(match[1]);
+  return Number.isFinite(value) ? `0x${(value >>> 0).toString(16).padStart(8, '0')} (${value >>> 0})` : match[1];
+}
+
+async function verifyAuthorizationAfterTlError(client) {
+  if (!client) return false;
+  try {
+    if (client.connected === false) {
+      await client.connect();
+    }
+
+    // GramJS exposes isUserAuthorized() in its client API. Some builds expose
+    // checkAuthorization() instead; both issue updates.getState and return a
+    // boolean without requiring a User/Message object in the response.
+    if (typeof client.isUserAuthorized === 'function') {
+      return Boolean(await client.isUserAuthorized());
+    }
+    if (typeof client.checkAuthorization === 'function') {
+      return Boolean(await client.checkAuthorization());
+    }
+
+    const GetState = gram?.Api?.updates?.GetState;
+    if (typeof GetState === 'function' && typeof client.invoke === 'function') {
+      await client.invoke(new GetState());
+      return true;
+    }
+  } catch (verificationError) {
+    console.warn('[KesugGram] Authorization probe after TL decode error failed:', verificationError);
+  }
+  return false;
+}
+
+function saveConfirmedSession(client, remember) {
+  if (!client?.session || typeof client.session.save !== 'function') {
+    throw new Error('Telegram подтвердил вход, но StringSession недоступна для сохранения.');
+  }
+  const value = client.session.save();
+  if (remember && value) {
+    localStorage.setItem(SESSION_KEY, value);
+    console.info('[KesugGram] Confirmed Telegram session saved locally.');
+  } else if (!remember) {
+    localStorage.removeItem(SESSION_KEY);
+  }
+  return value;
 }
 
 async function installBrowserNodeGlobals() {
@@ -645,6 +709,21 @@ async function loadGramJS() {
     const StringSession = mod.sessions?.StringSession || mod.StringSession;
     const Api = mod.Api || mod.tl?.Api;
 
+    const readCtorId = (ctor) => {
+      const raw = ctor?.CONSTRUCTOR_ID ?? ctor?.constructorId ?? ctor?.ID;
+      if (typeof raw === 'number') return `0x${(raw >>> 0).toString(16).padStart(8, '0')}`;
+      if (typeof raw === 'string') {
+        const parsed = /^0x/i.test(raw) ? Number.parseInt(raw, 16) : Number(raw);
+        return Number.isFinite(parsed) ? `0x${(parsed >>> 0).toString(16).padStart(8, '0')}` : raw;
+      }
+      return 'not-exported';
+    };
+    console.info('[KesugGram] TL schema diagnostics:', {
+      User: readCtorId(Api?.User),
+      Message: readCtorId(Api?.Message),
+      expectedObservedOnServer: { User: '0x8f97c628', Message: '0x38116ee0' }
+    });
+
     if (typeof TelegramClient !== 'function' || typeof StringSession !== 'function') {
       throw new Error('В window.gramjs отсутствуют TelegramClient или sessions.StringSession. Возможно, CDN вернул не UMD bundle.');
     }
@@ -765,38 +844,90 @@ async function authSubmit(event) {
     setBusy(true, 'Подключаюсь…');
 
     let phoneWasUsed = false;
+    let authConfirmedAfterTlError = false;
     authStage = 'подключение и авторизация Telegram';
     console.log('LOG: Попытка коннекта к Vesta (DC2)...');
-    await telegramClient.start({
-      phoneNumber: async () => {
-        if (phone && !phoneWasUsed) { phoneWasUsed = true; return phone; }
-        return await askTelegramChallenge('phone');
-      },
-      phoneCode: async (isCodeViaApp) => {
-        const hint = isCodeViaApp ? 'Код отправлен в приложение Telegram.' : 'Telegram выбрал SMS для подтверждения.';
-        return await askTelegramChallenge('code', hint);
-      },
-      password: async (hint) => await askTelegramChallenge('password', hint || ''),
-      onError: async (error) => {
-        if (cancelRequested) return true;
-        lastAuthError = explainGramError(error);
-        setStatus(lastAuthError, 'error');
-        return false;
+    try {
+      await telegramClient.start({
+        phoneNumber: async () => {
+          if (phone && !phoneWasUsed) { phoneWasUsed = true; return phone; }
+          return await askTelegramChallenge('phone');
+        },
+        phoneCode: async (isCodeViaApp) => {
+          const hint = isCodeViaApp ? 'Код отправлен в приложение Telegram.' : 'Telegram выбрал SMS для подтверждения.';
+          return await askTelegramChallenge('code', hint);
+        },
+        password: async (hint) => await askTelegramChallenge('password', hint || ''),
+        onError: async (error) => {
+          if (cancelRequested) return true;
+          lastAuthError = explainGramError(error);
+          setStatus(lastAuthError, 'error');
+          return false;
+        }
+      });
+    } catch (startError) {
+      if (!isTlDecodeError(startError)) throw startError;
+      const ctor = extractTlConstructorId(startError);
+      console.warn('[KesugGram] TL decoder rejected an object during start(); checking authorization independently.', ctor || startError);
+      setStatus('Telegram вернул объект старого TL-формата. Проверяю, завершился ли вход на сервере…');
+      authConfirmedAfterTlError = await verifyAuthorizationAfterTlError(telegramClient);
+      if (!authConfirmedAfterTlError) {
+        throw new Error(`Не удалось подтвердить авторизацию после ошибки TL-схемы${ctor ? ` (${ctor})` : ''}. Код не будет считаться принятым, сессия не сохранена. Нужна совместимая браузерная сборка GramJS.`);
       }
-    });
+      // A server-side authorization probe succeeded. It is now safe to persist
+      // the session if the user explicitly asked to remember it.
+      saveConfirmedSession(telegramClient, remember);
+      console.warn('[KesugGram] Telegram authorization is confirmed despite a TL decode error. Continuing cautiously.');
+    }
 
     authStage = 'получение профиля Telegram';
-    const me = await telegramClient.getMe();
-    if (!me) throw new Error('Telegram не вернул профиль пользователя после авторизации.');
-    const saved = telegramClient.session.save();
-    if (remember) localStorage.setItem(SESSION_KEY, saved);
-    else localStorage.removeItem(SESSION_KEY);
+    let me = null;
+    try {
+      me = await telegramClient.getMe();
+    } catch (profileError) {
+      if (!isTlDecodeError(profileError)) throw profileError;
+      const ctor = extractTlConstructorId(profileError);
+      console.warn('[KesugGram] getMe() could not decode a TL object; probing auth state.', ctor || profileError);
+      const confirmed = authConfirmedAfterTlError || await verifyAuthorizationAfterTlError(telegramClient);
+      if (!confirmed) throw profileError;
+      authConfirmedAfterTlError = true;
+      saveConfirmedSession(telegramClient, remember);
+      // Do not fabricate a Telegram profile or leave demo chats visible.
+      window.KesugGramBridge?.setChats([]);
+      hideGate();
+      setStatus(`Вход подтверждён Telegram, но профиль не удалось прочитать из-за несовместимой TL-схемы${ctor ? ` (${ctor})` : ''}. Сессия сохранена по твоему выбору; нужен более новый browser bundle.`, 'error');
+      window.KesugGramBridge?.toast('Telegram подтвердил вход. Чтение профиля и чатов ждёт обновления TL-схемы.');
+      return;
+    }
 
+    if (!me) {
+      if (!authConfirmedAfterTlError) throw new Error('Telegram не вернул профиль пользователя после авторизации.');
+      saveConfirmedSession(telegramClient, remember);
+      window.KesugGramBridge?.setChats([]);
+      hideGate();
+      setStatus('Вход подтверждён, но профиль Telegram не вернулся. Сессия сохранена по твоему выбору; обнови браузерную TL-схему.', 'error');
+      return;
+    }
+
+    saveConfirmedSession(telegramClient, remember);
     window.KesugGramBridge?.setAccount(me);
+    // Clear demo content before requesting real Telegram dialogs. If the old
+    // update queue contains legacy TL constructors, the UI must not present
+    // demo chats as if they were live Telegram chats.
+    window.KesugGramBridge?.setChats([]);
     hideGate();
-    setStatus('Аккаунт подключён.', 'success');
-    try { await loadTelegramDialogs(); } catch (loadError) { window.KesugGramBridge?.toast(`Вход выполнен, но диалоги не загрузились: ${explainGramError(loadError)}`); }
-    startLightUpdates();
+    setStatus(authConfirmedAfterTlError ? 'Аккаунт подтверждён. Загружаю переписки после TL-предупреждения…' : 'Аккаунт подключён.', 'success');
+    try {
+      await loadTelegramDialogs();
+      startLightUpdates();
+    } catch (loadError) {
+      console.error('[KesugGram] Telegram login succeeded, but dialogs could not be decoded:', loadError);
+      window.KesugGramBridge?.setChats([]);
+      const ctor = extractTlConstructorId(loadError);
+      const suffix = isTlDecodeError(loadError) ? ` TL-конструктор ${ctor || 'неизвестен'}.` : '';
+      setStatus(`Вход выполнен и сессия сохранена, но список чатов не удалось прочитать.${suffix} Нужна совместимая TL-схема.`, 'error');
+      window.KesugGramBridge?.toast('Вход выполнен, но GramJS не смог разобрать ответ со списком чатов.');
+    }
   } catch (error) {
     console.error(`[KesugGram] Ошибка на этапе: ${authStage}`, error);
     if (error?.stack) console.error('[KesugGram] Stack trace:', error.stack);
