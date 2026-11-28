@@ -428,10 +428,19 @@ restore();applySettings();if(!settings.motion)document.documentElement.classList
 })();
 </script>
 
+<script type="importmap">
+{
+  "imports": {
+    "crypto": "https://esm.sh/crypto-browserify@3.12.1?bundle",
+    "node:crypto": "https://esm.sh/crypto-browserify@3.12.1?bundle"
+  }
+}
+</script>
+
 <script type="module">
 const API_ID = 17349;
 const SESSION_KEY = 'kesuggram:telegram-session:v1';
-const GRAMJS_URL = 'https://esm.sh/telegram@2.26.22?bundle';
+const GRAMJS_URL = 'https://esm.sh/telegram@2.26.22?bundle&external=crypto,node:crypto';
 const $ = (selector) => document.querySelector(selector);
 let gram = null, telegramClient = null, apiHashMemory = '', authResolver = null, lastAuthError = '';
 let authPhase = 'credentials', cancelRequested = false, livePeers = new Map(), olderLoading = new Set(), olderExhausted = new Set();
@@ -474,6 +483,8 @@ function explainGramError(error) {
   }
   if (code.includes('AUTH_KEY_UNREGISTERED')) return 'Сохранённая сессия больше не действует. Войди по номеру ещё раз.';
   if (code.includes('BUFFER IS NOT DEFINED')) return 'Не загрузился Buffer-полифилл для браузера. Проверь доступ к esm.sh и jsdelivr, затем обнови страницу.';
+  if (code.includes('UNENV') && (code.includes('CRYPTO.CREATEHASH') || code.includes('CRYPTO.CREATEHMAC') || code.includes('CRYPTO.RANDOMBYTES'))) return 'GramJS всё ещё получил заглушку unenv вместо crypto-browserify. Проверь, что import map расположен выше module script и что CDN esm.sh доступен. Не заменяй window.crypto вручную.';
+  if (code.includes('CRYPTO-BROWSERIFY') || code.includes('CREATEHASH IS NOT A FUNCTION')) return 'Не удалось загрузить совместимый Node crypto-модуль для браузера. Проверь CDN esm.sh и обнови страницу.';
   if (code.includes('FAILED TO FETCH DYNAMICALLY IMPORTED MODULE') || code.includes('IMPORTING A MODULE SCRIPT FAILED') || code.includes('ERR_NAME_NOT_RESOLVED') || code.includes('ERR_CONNECTION') || code.includes('FETCH FAILED')) return 'Не загрузилась библиотека GramJS с esm.sh. Проверь доступ к esm.sh, отключи блокировщик для сайта или открой KesugGram через GitHub Pages по HTTPS.';
   if (code.includes('NETWORK') || code.includes('WEBSOCKET') || code.includes('CONNECTION')) return 'Не удалось подключиться к Telegram по WebSocket. Проверь интернет/VPN и попробуй позже.';
   return String(error?.message || error || 'Неизвестная ошибка Telegram').replace(/^Error:\s*/,'').slice(0,240);
@@ -510,11 +521,47 @@ async function installBrowserNodeGlobals() {
   return globalThis.Buffer;
 }
 
+async function installBrowserCrypto() {
+  // Важно: crypto.createHash() из Node API синхронный и потоковый.
+  // window.crypto.subtle.digest() асинхронный и не является drop-in заменой.
+  // Поэтому Node-импорты `crypto` и `node:crypto` направляются import map
+  // на crypto-browserify, а нативный window.crypto остаётся нетронутым:
+  // он нужен полифиллу для криптографически стойких randomBytes().
+  let cryptoModule;
+  try {
+    cryptoModule = await import('crypto');
+  } catch (error) {
+    throw new Error('Не удалось загрузить crypto-browserify из esm.sh: ' + (error?.message || error));
+  }
+  const api = (typeof cryptoModule.createHash === 'function')
+    ? cryptoModule
+    : (cryptoModule.default && typeof cryptoModule.default.createHash === 'function' ? cryptoModule.default : null);
+  if (!api || typeof api.createHmac !== 'function' || typeof api.randomBytes !== 'function') {
+    throw new Error('crypto-browserify загружен, но не предоставляет createHash/createHmac/randomBytes.');
+  }
+
+  // Быстрые self-checks: проверяем точный SHA-256 и HMAC-SHA256 результат.
+  const hash = api.createHash('sha256').update('KesugGram crypto self-test').digest('hex');
+  if (hash !== '1260259f4ae0fc5de53f75e9a14d2a35b1270dff440d98cb22c03289830ac600') {
+    throw new Error('Проверка SHA-256 для crypto-browserify не пройдена.');
+  }
+  const mac = api.createHmac('sha256', 'kesuggram-test-key').update('KesugGram HMAC self-test').digest('hex');
+  if (mac !== '5c6ed6647beccd860679f2de33eee4e21411287f19224f8954f545b371f79acc') {
+    throw new Error('Проверка HMAC-SHA256 для crypto-browserify не пройдена.');
+  }
+  const random = api.randomBytes(16);
+  if (!random || random.length !== 16) throw new Error('Проверка randomBytes для crypto-browserify не пройдена.');
+  globalThis.__KESUGRAM_NODE_CRYPTO__ = api;
+  return api;
+}
+
 async function loadGramJS() {
   if (gram) return gram;
   setStatus('Подготавливаю браузерную среду…');
   await installBrowserNodeGlobals();
-  setStatus('Загружаю GramJS из esm.sh…');
+  setStatus('Подготавливаю Node crypto для браузера…');
+  await installBrowserCrypto();
+  setStatus('Загружаю GramJS с внешним browser crypto…');
   const mod = await import(GRAMJS_URL);
   const sessions = mod.sessions || mod.default?.sessions;
   const extensions = mod.extensions || mod.default?.extensions;
