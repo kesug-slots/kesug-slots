@@ -135,14 +135,12 @@ button:disabled{opacity:.42;cursor:not-allowed}
 @media(max-width:520px){.auth-gate{padding:14px}.auth-card{padding:23px;border-radius:25px}.auth-title{font-size:26px}}
 
 </style>
-<!-- Browser Buffer UMD polyfill. The GramJS browser bundle also embeds Buffer internally. -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/buffer/6.0.3/buffer.min.js"
-        onload="(function(){var B=(window.buffer&&window.buffer.Buffer)||window.Buffer;if(B&&!window.Buffer)window.Buffer=B;if(!window.global)window.global=window;}())"
-        onerror="console.warn('[KesugGram] External Buffer global polyfill did not load; the GramJS UMD bundle has its own bundled Buffer.');"></script>
+<!-- Local-only browser bootstrap. No CDN requests are made. -->
 <script>
 (function () {
   if (!window.global) window.global = window;
-  if (!window.Buffer && window.buffer && window.buffer.Buffer) window.Buffer = window.buffer.Buffer;
+  window.__KESUGGRAM_LOCAL_BUNDLE_ERROR__ = null;
+  window.__KESUGGRAM_LOCAL_BUNDLE_READY__ = false;
 })();
 </script>
 </head>
@@ -412,9 +410,13 @@ restore();applySettings();if(!settings.motion)document.documentElement.classList
 })();
 </script>
 
-
-
-
+<!-- Keep the browser UMD file named telegram.js beside index.html. -->
+<script
+  id="kesuggram-local-gramjs"
+  src="./telegram.js"
+  onload="window.__KESUGGRAM_LOCAL_BUNDLE_READY__ = true; console.info('[KesugGram] Local ./telegram.js loaded.');"
+  onerror="window.__KESUGGRAM_LOCAL_BUNDLE_ERROR__ = 'Не удалось загрузить ./telegram.js. Проверь, что файл лежит рядом с index.html и опубликован в том же каталоге GitHub Pages.'; console.error('[KesugGram]', window.__KESUGGRAM_LOCAL_BUNDLE_ERROR__);"
+></script>
 
 <script>
 const API_ID = 17349;
@@ -422,15 +424,14 @@ const API_ID = 17349;
 // В публичном клиентском HTML API_HASH виден в исходном коде — это неизбежно без backend.
 const API_HASH = '344583e45741c457fe1862106095a5eb';
 const SESSION_KEY = 'kesuggram:telegram-session:v1';
-// GramJS browser-specific npm dist-tag. The npm package is named `telegram`,
-// and its webpack output is browser/telegram.js (UMD global: window.telegram).
-// Do NOT import the normal `telegram` Node entry: it can pull in `net`, `socks`, etc.
-const GRAMJS_BROWSER_BUNDLES = [
-  {
-    name: 'Official GramJS browser UMD · v2.17.4 (legacy schema; runtime TL check enabled)',
-    url: 'https://github.com/gram-js/gramjs/releases/download/v2.17.4/telegram.js'
-  }
-];
+// Local browser UMD only. The file ./telegram.js must be next to index.html.
+// This must be a GramJS browser build (webpack target: web, libraryTarget: umd),
+// not the Node entry point. The official webpack config embeds Buffer internally.
+const GRAMJS_LOCAL_BUNDLE = './telegram.js';
+const TL_LAYER_158_EXPECTED = Object.freeze({
+  User: 0x8f97c628,
+  Message: 0x38116ee0
+});
 const $ = (selector) => document.querySelector(selector);
 let gram = null, telegramClient = null, authResolver = null, lastAuthError = '';
 let authPhase = 'credentials', cancelRequested = false, livePeers = new Map(), olderLoading = new Set(), olderExhausted = new Set();
@@ -474,11 +475,11 @@ function explainGramError(error) {
   if (code.includes('AUTH_KEY_UNREGISTERED')) return 'Сохранённая сессия больше не действует. Войди по номеру ещё раз.';
   if (code.includes('COULD NOT FIND A MATCHING CONSTRUCTOR ID') || code.includes('MISSING MTPROTO ENTITY') || code.includes('TYPENOTFOUNDERROR')) return 'GramJS получил TL-конструктор, которого нет в загруженной схеме. Это нельзя безопасно игнорировать без проверки авторизации; проверь TL schema diagnostics в консоли.';
   if (code.includes('CLASS CONSTRUCTOR') && code.includes('WITHOUT')) return 'GramJS или одна из его зависимостей вызвала ES-класс как обычную функцию. В консоли указаны этап и stack trace; пришли их, если ошибка повторится.';
-  if (code.includes('BUFFER IS NOT DEFINED')) return 'Не загрузился Buffer-полифилл для браузера. Проверь доступ к CDN с browser bundle и обнови страницу.';
-  if (code.includes('UNENV') && (code.includes('CRYPTO.CREATEHASH') || code.includes('CRYPTO.CREATEHMAC') || code.includes('CRYPTO.RANDOMBYTES'))) return 'GramJS получил unenv вместо hash.js crypto-shim. Проверь браузерный crypto-shim и доступ к hash.js CDN.';
+  if (code.includes('BUFFER IS NOT DEFINED')) return 'Локальная браузерная сборка telegram.js не предоставила Buffer. Нужен UMD bundle, собранный webpack-конфигурацией GramJS для web.';
+  if (code.includes('UNENV') && (code.includes('CRYPTO.CREATEHASH') || code.includes('CRYPTO.CREATEHMAC') || code.includes('CRYPTO.RANDOMBYTES'))) return 'В локальный telegram.js попала Node-сборка или несовместимая crypto-зависимость. Нужна browser UMD-сборка GramJS.';
   if (code.includes('CLASS CONSTRUCTOR') && (code.includes('WITHOUT') || code.includes('NEW'))) return 'Ошибка конструктора возникла внутри одной из ESM-зависимостей. Проверь полный Stack Trace и URL проблемного модуля.';
-  if (code.includes('HASH.JS CRYPTO-SHIM') || code.includes('CREATEHASH IS NOT A FUNCTION')) return 'Не удалось загрузить hash.js crypto-shim. Проверь доступ к UNPKG ESM/jsDelivr и обнови страницу.';
-  if (code.includes('FAILED TO FETCH DYNAMICALLY IMPORTED MODULE') || code.includes('IMPORTING A MODULE SCRIPT FAILED') || code.includes('ERR_NAME_NOT_RESOLVED') || code.includes('ERR_CONNECTION') || code.includes('FETCH FAILED')) return 'Не загрузился браузерный bundle GramJS с jsDelivr или UNPKG. Проверь доступ к CDN, блокировщик и GitHub Pages по HTTPS.';
+  if (code.includes('HASH.JS CRYPTO-SHIM') || code.includes('CREATEHASH IS NOT A FUNCTION')) return 'Локальная browser UMD-сборка использует неподдерживаемый Node crypto API. Не подменяй window.crypto; проверь, что telegram.js собран для браузера.';
+  if (code.includes('FAILED TO FETCH DYNAMICALLY IMPORTED MODULE') || code.includes('IMPORTING A MODULE SCRIPT FAILED') || code.includes('ERR_NAME_NOT_RESOLVED') || code.includes('ERR_CONNECTION') || code.includes('FETCH FAILED')) return 'Не удалось загрузить локальную библиотеку. Проверь файл telegram.js рядом с index.html.';
   if (code.includes('NETWORK') || code.includes('WEBSOCKET') || code.includes('CONNECTION')) return 'Не удалось подключиться к Telegram по WebSocket. Проверь интернет/VPN и попробуй позже.';
   return String(error?.message || error || 'Неизвестная ошибка Telegram').replace(/^Error:\s*/,'').slice(0,240);
 }
@@ -547,9 +548,8 @@ function saveConfirmedSession(client, remember) {
 }
 
 async function installBrowserNodeGlobals() {
-  // The official browser UMD bundle includes its Buffer dependency through
-  // GramJS's webpack ProvidePlugin. Expose a global Buffer as well when the
-  // standalone CDN polyfill has loaded, for browser-side helpers.
+  // The official browser webpack bundle injects its own Buffer dependency via
+  // ProvidePlugin. A separate global Buffer file is not required by that bundle.
   if (typeof globalThis.global === 'undefined') globalThis.global = globalThis;
 
   if (typeof globalThis.Buffer === 'undefined' && globalThis.buffer?.Buffer) {
@@ -557,126 +557,48 @@ async function installBrowserNodeGlobals() {
   }
 
   if (typeof globalThis.Buffer !== 'undefined') {
-    console.info('[KesugGram] Buffer polyfill ready.');
+    console.info('[KesugGram] Buffer global is available.');
   } else {
-    console.info('[KesugGram] Buffer global is not present; using Buffer bundled inside official GramJS UMD.');
+    console.info('[KesugGram] Buffer is bundled internally by the GramJS browser UMD build.');
   }
   return globalThis.Buffer || null;
 }
 
 async function installBrowserCrypto() {
-  // hash.js is loaded as an optional browser helper. We do NOT overwrite
-  // window.crypto: Web Crypto is the browser's secure RNG implementation.
-  // The official GramJS browser bundle is built with its browser-specific
-  // sources and webpack fallback crypto:false, so Node crypto-browserify is
-  // deliberately not injected into this bundle.
-  let hashModule = null;
-  let lastError = null;
-  const urls = [
-    'https://cdn.jsdelivr.net/npm/hash.js@1.1.7/+esm',
-    'https://esm.unpkg.com/hash.js@1.1.7?target=es2020'
-  ];
-
-  for (const url of urls) {
-    try {
-      hashModule = await import(url); // dynamic import works inside a classic script
-      break;
-    } catch (error) {
-      lastError = error;
-      console.warn('[KesugGram] hash.js CDN failed:', url, error);
-    }
+  // Do not patch window.crypto or emulate Node's synchronous createHash here.
+  // GramJS's browser webpack build is configured for the web platform and
+  // disables the Node crypto fallback; it should use browser-specific code.
+  const webCrypto = globalThis.crypto;
+  if (!webCrypto || typeof webCrypto.getRandomValues !== 'function' || !webCrypto.subtle) {
+    throw new Error('В этом браузере недоступен Web Crypto (crypto.getRandomValues / crypto.subtle). Открой KesugGram через HTTPS.');
   }
 
-  if (!hashModule) {
-    console.warn('[KesugGram] hash.js helper unavailable; continue with browser-native crypto in the UMD bundle.', lastError);
-    globalThis.__KESUGRAM_HASHJS__ = null;
-    return null;
-  }
-
-  const hash = hashModule.default || hashModule;
-  if (typeof hash.sha1 !== 'function' || typeof hash.sha256 !== 'function' || typeof hash.hmac !== 'function') {
-    console.warn('[KesugGram] hash.js loaded but expected SHA/HMAC exports were not found.');
-    globalThis.__KESUGRAM_HASHJS__ = null;
-    return null;
-  }
-
-  const sha1 = hash.sha1().update('abc').digest('hex');
-  const sha256 = hash.sha256().update('abc').digest('hex');
-  const hmac = hash.hmac(hash.sha256, 'key').update('The quick brown fox jumps over the lazy dog').digest('hex');
-  if (sha1 !== 'a9993e364706816aba3e25717850c26c9cd0d89d' ||
-      sha256 !== 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad' ||
-      hmac !== 'f7bc83f430538424b13298e6aa6fb143ef4d59a14946175997479dbc2d1a3cd8') {
-    throw new Error('Проверка hash.js SHA-1/SHA-256/HMAC завершилась ошибкой.');
-  }
-
-  globalThis.__KESUGRAM_HASHJS__ = hash;
-  console.info('[KesugGram] hash.js SHA-1/SHA-256/HMAC self-tests passed.');
-  return hash;
+  // The previous hash.js helper only ran self-tests; it did not populate
+  // GramJS's internal TL/crypto modules. It is intentionally not injected as
+  // a fake Node crypto implementation. A local UMD bundle carries its own
+  // browser-targeted dependencies.
+  globalThis.__KESUGGRAM_HASHJS__ = null;
+  console.info('[KesugGram] Native Web Crypto is ready; no Node crypto shim injected.');
+  return webCrypto;
 }
 
-function loadClassicScript(url) {
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = url;
-    script.async = true;
-    script.referrerPolicy = 'strict-origin-when-cross-origin';
-    script.dataset.kesuggramGramjs = 'true';
-    script.onload = () => resolve(script);
-    script.onerror = () => {
-      script.remove();
-      reject(new Error(`Не удалось загрузить обычный JavaScript UMD-скрипт: ${url}. Проверь ответ сервера, MIME type и доступ к GitHub Releases.`));
-    };
-    document.head.appendChild(script);
-  });
+function getLocalGramJSGlobal() {
+  const candidates = [window.gramjs, window.telegram, window.GramJS];
+  return candidates.find(value => value && typeof value.TelegramClient === 'function') || null;
 }
 
-// GitHub Releases sometimes serves .js assets as application/octet-stream.
-// Fetching the asset and re-serving it as a same-origin Blob gives the browser
-// an explicit JavaScript MIME type. If CORS is denied, try a normal classic
-// <script src> request as a fallback and report its real outcome.
-async function loadGramJSBundle(bundle) {
-  let fetchError = null;
-
-  if (typeof fetch === 'function' && typeof URL.createObjectURL === 'function') {
-    try {
-      const response = await fetch(bundle.url, {
-        method: 'GET',
-        mode: 'cors',
-        credentials: 'omit',
-        cache: 'force-cache'
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status} ${response.statusText || ''}`.trim());
-      }
-
-      const source = await response.text();
-      if (!source || source.length < 100000 || /^\s*<!doctype html/i.test(source) || /^\s*<html/i.test(source)) {
-        throw new Error('Вместо JavaScript bundle сервер вернул пустой или HTML-ответ.');
-      }
-
-      const blobUrl = URL.createObjectURL(new Blob([source], { type: 'text/javascript;charset=utf-8' }));
-      try {
-        await loadClassicScript(blobUrl);
-      } finally {
-        // Keep the Blob URL alive briefly for lazy chunks/source-map lookups.
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 30000);
-      }
-      console.info('[KesugGram] UMD bundle loaded through JavaScript Blob (MIME normalized).');
-      return 'blob';
-    } catch (error) {
-      fetchError = error;
-      console.warn('[KesugGram] Fetch→Blob path unavailable; trying a normal classic script tag.', error);
-    }
+function readConstructorId(ctor) {
+  const raw = ctor?.CONSTRUCTOR_ID ?? ctor?.constructorId ?? ctor?.ID;
+  if (typeof raw === 'number') return raw >>> 0;
+  if (typeof raw === 'string') {
+    const parsed = /^0x/i.test(raw) ? Number.parseInt(raw, 16) : Number(raw);
+    if (Number.isFinite(parsed)) return parsed >>> 0;
   }
+  return null;
+}
 
-  try {
-    await loadClassicScript(bundle.url);
-    console.info('[KesugGram] UMD bundle loaded as a classic external script.');
-    return 'script';
-  } catch (scriptError) {
-    const detail = fetchError ? ` Fetch/CORS: ${fetchError.message}.` : '';
-    throw new Error(`Не удалось загрузить браузерный GramJS UMD bundle.${detail} Script: ${scriptError.message}`);
-  }
+function formatConstructorId(value) {
+  return Number.isInteger(value) ? `0x${(value >>> 0).toString(16).padStart(8, '0')}` : 'not-exported';
 }
 
 async function loadGramJS() {
@@ -684,61 +606,64 @@ async function loadGramJS() {
   if (window.__KESUGGRAM_GRAMJS_LOADING__) return window.__KESUGGRAM_GRAMJS_LOADING__;
 
   window.__KESUGGRAM_GRAMJS_LOADING__ = (async () => {
-    setStatus('Подготавливаю браузерную среду…');
+    setStatus('Проверяю локальную браузерную библиотеку…');
     await installBrowserNodeGlobals();
-    setStatus('Проверяю браузерные хеш-функции…');
     await installBrowserCrypto();
-    setStatus('Загружаю браузерный UMD bundle GramJS…');
 
-    const bundle = GRAMJS_BROWSER_BUNDLES[0];
-    console.info(`[KesugGram] Загружаю UMD bundle: ${bundle.name}`, bundle.url);
-    const loadMode = await loadGramJSBundle(bundle);
-
-    // The browser UMD build exposes library="telegram" globally.
-    console.info(`[KesugGram] UMD load mode: ${loadMode}`);
-    // GramJS webpack config declares library="telegram" and libraryTarget="umd".
-    const mod = window.telegram || globalThis.telegram;
-    if (!mod) {
-      throw new Error('UMD-скрипт загрузился, но глобальный объект window.telegram не найден. Проверь MIME type и содержимое telegram.js.');
+    if (window.__KESUGGRAM_LOCAL_BUNDLE_ERROR__) {
+      throw new Error(window.__KESUGGRAM_LOCAL_BUNDLE_ERROR__);
     }
 
-    // Friendly alias requested by the KesugGram client.
+    const mod = getLocalGramJSGlobal();
+    if (!mod) {
+      throw new Error(`Локальный ${GRAMJS_LOCAL_BUNDLE} не загрузился или не экспортирует window.telegram.TelegramClient. Проверь, что это browser UMD, а не Node.js entry.`);
+    }
+
     window.gramjs = mod;
-
-    const TelegramClient = mod.TelegramClient;
-    const StringSession = mod.sessions?.StringSession || mod.StringSession;
-    const Api = mod.Api || mod.tl?.Api;
-
-    const readCtorId = (ctor) => {
-      const raw = ctor?.CONSTRUCTOR_ID ?? ctor?.constructorId ?? ctor?.ID;
-      if (typeof raw === 'number') return `0x${(raw >>> 0).toString(16).padStart(8, '0')}`;
-      if (typeof raw === 'string') {
-        const parsed = /^0x/i.test(raw) ? Number.parseInt(raw, 16) : Number(raw);
-        return Number.isFinite(parsed) ? `0x${(parsed >>> 0).toString(16).padStart(8, '0')}` : raw;
-      }
-      return 'not-exported';
-    };
-    console.info('[KesugGram] TL schema diagnostics:', {
-      User: readCtorId(Api?.User),
-      Message: readCtorId(Api?.Message),
-      expectedObservedOnServer: { User: '0x8f97c628', Message: '0x38116ee0' }
-    });
+    const TelegramClient = window.gramjs.TelegramClient;
+    const StringSession = window.gramjs.sessions?.StringSession || window.gramjs.StringSession;
+    const Api = window.gramjs.Api || window.gramjs.tl?.Api;
 
     if (typeof TelegramClient !== 'function' || typeof StringSession !== 'function') {
-      throw new Error('В window.gramjs отсутствуют TelegramClient или sessions.StringSession. Возможно, CDN вернул не UMD bundle.');
+      throw new Error('В локальном window.gramjs отсутствуют TelegramClient или StringSession. Проверь UMD-экспорты telegram.js.');
+    }
+    if (!Api || typeof Api.User !== 'function' || typeof Api.Message !== 'function') {
+      throw new Error('В локальном telegram.js не найдены Api.User и Api.Message. Похоже, TL-схема в bundle неполная или экспортирована иначе.');
     }
 
-    console.info('[KesugGram] Browser UMD bundle ready:', {
-      provider: bundle.name,
+    const actualTL = {
+      User: readConstructorId(Api.User),
+      Message: readConstructorId(Api.Message)
+    };
+    const expectedTL = {
+      User: TL_LAYER_158_EXPECTED.User,
+      Message: TL_LAYER_158_EXPECTED.Message
+    };
+    console.info('[KesugGram] Local GramJS UMD ready:', {
+      source: GRAMJS_LOCAL_BUNDLE,
       globalName: 'window.gramjs',
       TelegramClient: TelegramClient.name || '(anonymous class)',
       StringSession: StringSession.name || '(anonymous class)',
-      clientType: typeof TelegramClient,
-      sessionType: typeof StringSession,
-      exports: Object.keys(mod).slice(0, 24)
+      apiExports: Object.keys(Api).length,
+      actualTL: {
+        User: formatConstructorId(actualTL.User),
+        Message: formatConstructorId(actualTL.Message)
+      },
+      observedLayer158Constructors: {
+        User: formatConstructorId(expectedTL.User),
+        Message: formatConstructorId(expectedTL.Message)
+      }
     });
 
-    gram = { TelegramClient, StringSession, Api, provider: bundle.name };
+    // These are genuine layer-158 constructor IDs (User and Message). The
+    // binary reader resolves constructors through GramJS's compiled internal
+    // tlobjects registry, not merely through window.gramjs.Api. Adding two
+    // constants here would NOT register their parsers or field layouts.
+    if (actualTL.User !== expectedTL.User || actualTL.Message !== expectedTL.Message) {
+      console.warn('[KesugGram] This bundle exports a different/current TL layer. This is not automatically wrong, but it does not prove that legacy layer-158 IDs are present in its internal decoder registry. If Telegram still sends those IDs, replace telegram.js with a full browser UMD built from a matching/current GramJS schema.');
+    }
+
+    gram = { TelegramClient, StringSession, Api, provider: GRAMJS_LOCAL_BUNDLE, actualTL, expectedTL };
     return gram;
   })();
 
@@ -824,8 +749,8 @@ async function authSubmit(event) {
   cancelRequested = false;
   lastAuthError = '';
   setBusy(true, 'Загружаю клиент…');
-  setStatus('Подготавливаю защищённое соединение…');
-  let authStage = 'загрузка модулей GramJS';
+  setStatus('Подготавливаю локальную браузерную библиотеку…');
+  let authStage = 'загрузка локального telegram.js';
   try {
     const { TelegramClient, StringSession } = await loadGramJS();
     const savedSession = localStorage.getItem(SESSION_KEY) || '';
@@ -839,7 +764,7 @@ async function authSubmit(event) {
       autoReconnect: true
     };
     authStage = 'создание TelegramClient';
-    telegramClient = new TelegramClient(session, API_ID, API_HASH, options);
+    telegramClient = new window.gramjs.TelegramClient(session, API_ID, API_HASH, options);
     setStatus(savedSession ? 'Проверяю сохранённую Telegram-сессию…' : 'Подключаюсь к Telegram…');
     setBusy(true, 'Подключаюсь…');
 
@@ -1145,7 +1070,7 @@ if (localStorage.getItem(SESSION_KEY)) {
 // Keep demo accessible when the ESM CDN is blocked or unavailable.
 window.addEventListener('unhandledrejection', (event) => {
   if (String(event.reason?.message || '').includes('Failed to fetch dynamically imported module')) {
-    setStatus('Не удалось загрузить браузерный UMD bundle GramJS. Проверь доступ к GitHub Releases, CORS и MIME type ответа. Демо-режим остаётся доступен.', 'error');
+    setStatus('Не удалось загрузить локальный telegram.js. Проверь, что файл лежит рядом с index.html и имеет JavaScript MIME type.', 'error');
   }
 });
 </script>
