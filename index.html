@@ -407,8 +407,8 @@ restore();applySettings();if(!settings.motion)document.documentElement.classList
 <script type="importmap">
 {
   "imports": {
-    "crypto": "https://esm.sh/crypto-browserify@3.12.1?bundle",
-    "node:crypto": "https://esm.sh/crypto-browserify@3.12.1?bundle"
+    "crypto": "https://esm.sh/crypto-browserify@3.12.1?bundle&target=esnext&keep-names",
+    "node:crypto": "https://esm.sh/crypto-browserify@3.12.1?bundle&target=esnext&keep-names"
   }
 }
 </script>
@@ -469,6 +469,7 @@ function explainGramError(error) {
   if (code.includes('CLASS CONSTRUCTOR') && code.includes('WITHOUT')) return 'GramJS или одна из его зависимостей вызвала ES-класс как обычную функцию. В консоли указаны этап и stack trace; пришли их, если ошибка повторится.';
   if (code.includes('BUFFER IS NOT DEFINED')) return 'Не загрузился Buffer-полифилл для браузера. Проверь доступ к esm.sh и jsdelivr, затем обнови страницу.';
   if (code.includes('UNENV') && (code.includes('CRYPTO.CREATEHASH') || code.includes('CRYPTO.CREATEHMAC') || code.includes('CRYPTO.RANDOMBYTES'))) return 'GramJS всё ещё получил заглушку unenv вместо crypto-browserify. Проверь, что import map расположен выше module script и что CDN esm.sh доступен. Не заменяй window.crypto вручную.';
+  if (code.includes('CLASS CONSTRUCTOR') && (code.includes('WITHOUT') || code.includes('NEW'))) return 'Несовместимая сборка crypto-browserify. Обнови файл KesugGram: crypto и node:crypto должны загружаться с target=esnext, а не es2022.';
   if (code.includes('CRYPTO-BROWSERIFY') || code.includes('CREATEHASH IS NOT A FUNCTION')) return 'Не удалось загрузить совместимый Node crypto-модуль для браузера. Проверь CDN esm.sh и обнови страницу.';
   if (code.includes('FAILED TO FETCH DYNAMICALLY IMPORTED MODULE') || code.includes('IMPORTING A MODULE SCRIPT FAILED') || code.includes('ERR_NAME_NOT_RESOLVED') || code.includes('ERR_CONNECTION') || code.includes('FETCH FAILED')) return 'Не загрузилась библиотека GramJS с esm.sh. Проверь доступ к esm.sh, отключи блокировщик для сайта или открой KesugGram через GitHub Pages по HTTPS.';
   if (code.includes('NETWORK') || code.includes('WEBSOCKET') || code.includes('CONNECTION')) return 'Не удалось подключиться к Telegram по WebSocket. Проверь интернет/VPN и попробуй позже.';
