@@ -440,7 +440,7 @@ restore();applySettings();if(!settings.motion)document.documentElement.classList
 <script type="module">
 const API_ID = 17349;
 const SESSION_KEY = 'kesuggram:telegram-session:v1';
-const GRAMJS_URL = 'https://esm.sh/telegram@2.26.22?bundle&external=crypto,node:crypto';
+const GRAMJS_URL = 'https://esm.sh/telegram@2.26.22?bundle&target=esnext&keep-names&external=crypto,node:crypto';
 const $ = (selector) => document.querySelector(selector);
 let gram = null, telegramClient = null, apiHashMemory = '', authResolver = null, lastAuthError = '';
 let authPhase = 'credentials', cancelRequested = false, livePeers = new Map(), olderLoading = new Set(), olderExhausted = new Set();
@@ -483,6 +483,7 @@ function explainGramError(error) {
   }
   if (code.includes('AUTH_KEY_UNREGISTERED')) return 'Сохранённая сессия больше не действует. Войди по номеру ещё раз.';
   if (code.includes('BUFFER IS NOT DEFINED')) return 'Не загрузился Buffer-полифилл для браузера. Проверь доступ к esm.sh и jsdelivr, затем обнови страницу.';
+  if (code.includes('CLASS CONSTRUCTOR') && code.includes('WITHOUT') && code.includes('NEW')) return 'GramJS получил несовместимо преобразованный класс из CDN. Обновлённый файл использует target=esnext и нативный new. Если ошибка останется, пришли полный stack trace из консоли.';
   if (code.includes('UNENV') && (code.includes('CRYPTO.CREATEHASH') || code.includes('CRYPTO.CREATEHMAC') || code.includes('CRYPTO.RANDOMBYTES'))) return 'GramJS всё ещё получил заглушку unenv вместо crypto-browserify. Проверь, что import map расположен выше module script и что CDN esm.sh доступен. Не заменяй window.crypto вручную.';
   if (code.includes('CRYPTO-BROWSERIFY') || code.includes('CREATEHASH IS NOT A FUNCTION')) return 'Не удалось загрузить совместимый Node crypto-модуль для браузера. Проверь CDN esm.sh и обнови страницу.';
   if (code.includes('FAILED TO FETCH DYNAMICALLY IMPORTED MODULE') || code.includes('IMPORTING A MODULE SCRIPT FAILED') || code.includes('ERR_NAME_NOT_RESOLVED') || code.includes('ERR_CONNECTION') || code.includes('FETCH FAILED')) return 'Не загрузилась библиотека GramJS с esm.sh. Проверь доступ к esm.sh, отключи блокировщик для сайта или открой KesugGram через GitHub Pages по HTTPS.';
@@ -564,15 +565,16 @@ async function loadGramJS() {
   setStatus('Загружаю GramJS с внешним browser crypto…');
   const mod = await import(GRAMJS_URL);
   const sessions = mod.sessions || mod.default?.sessions;
-  const extensions = mod.extensions || mod.default?.extensions;
   const TelegramClient = mod.TelegramClient || mod.default?.TelegramClient;
   const StringSession = sessions?.StringSession;
-  const PromisedWebSockets = extensions?.PromisedWebSockets;
   const Api = mod.Api || mod.default?.Api;
-  if (!TelegramClient || !StringSession) {
-    throw new Error('ESM-модуль загрузился, но TelegramClient/StringSession не найдены в экспортах.');
+  if (typeof TelegramClient !== 'function' || typeof StringSession !== 'function') {
+    throw new Error('ESM-модуль загрузился, но TelegramClient/StringSession не являются конструкторами.');
   }
-  gram = { TelegramClient, StringSession, PromisedWebSockets, Api };
+  // Не передаём networkSocket вручную: браузерная сборка GramJS сама выбирает
+  // PromisedWebSockets через свои clientParamsDefault. Это исключает передачу
+  // класса сокета из другого/несовместимого export wrapper.
+  gram = { TelegramClient, StringSession, Api };
   return gram;
 }
 
@@ -653,16 +655,18 @@ async function authSubmit(event) {
   setBusy(true, 'Загружаю клиент…');
   setStatus('Подготавливаю защищённое соединение…');
   try {
-    const { TelegramClient, StringSession, PromisedWebSockets } = await loadGramJS();
+    const { TelegramClient, StringSession } = await loadGramJS();
     const savedSession = localStorage.getItem(SESSION_KEY) || '';
+    // Оба объекта создаются нативным оператором new.
+    // target=esnext в GRAMJS_URL сохраняет class/extends и не превращает
+    // super() в несовместимый вызов базового ES-класса как функции.
     const session = new StringSession(savedSession);
     const options = {
       connectionRetries: 5,
       requestRetries: 3,
       retryDelay: 1000,
       useWSS: true,
-      autoReconnect: true,
-      ...(PromisedWebSockets ? { networkSocket: PromisedWebSockets } : {})
+      autoReconnect: true
     };
     telegramClient = new TelegramClient(session, API_ID, apiHashMemory, options);
     setStatus(savedSession ? 'Проверяю сохранённую Telegram-сессию…' : 'Подключаюсь к Telegram…');
