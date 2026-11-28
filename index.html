@@ -419,10 +419,10 @@ restore();applySettings();if(!settings.motion)document.documentElement.classList
 ></script>
 
 <script>
-const API_ID = 2496;
+const API_ID = 2040;
 // Общие учётные данные приложения KesugGram. Они одинаковы для всех пользователей.
 // В публичном клиентском HTML API_HASH виден в исходном коде — это неизбежно без backend.
-const API_HASH = '8f1d88e153096236b2f672322a36b356';
+const API_HASH = 'b18441a1ed60511f2c253f7a1491702f';
 const SESSION_KEY = 'kesuggram:telegram-session:v1';
 // Local browser UMD only. The file ./telegram.js must be next to index.html.
 // This must be a GramJS browser build (webpack target: web, libraryTarget: umd),
@@ -762,13 +762,14 @@ async function authSubmit(event) {
     retryDelay: 1000,
     useWSS: true,
     autoReconnect: true,
-    // ВОТ ТУТ НАЧИНАЕТСЯ НАШ ЛЮТЫЙ КАМУФЛЯЖ 🎭
-    deviceModel: "Telegram Web K",
+    // ВОТ ОНА, НАША ЛЕГЕНДА МАСКИРОВКИ 🎭
+    deviceModel: "PC 64bit",
     systemVersion: "Windows 10",
-    appVersion: "2.1.0",
+    appVersion: "4.15.2",
     langCode: "ru",
     systemLangCode: "ru-RU"
 };
+
 
     authStage = 'создание TelegramClient';
     telegramClient = new window.gramjs.TelegramClient(session, API_ID, API_HASH, options);
